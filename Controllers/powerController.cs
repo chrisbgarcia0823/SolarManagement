@@ -104,7 +104,7 @@ namespace SolarManagement.Controllers
                 Ampere = current,
                 power = power,
                 EspNum = espNum,
-                datetimecreated = DateTime.Now,
+                datetimecreated = ToUTC8(),
             };
 
             _context.powertbl.Add(newPOwer);
@@ -136,6 +136,21 @@ namespace SolarManagement.Controllers
         private bool powerExists(int id)
         {
             return (_context.powertbl?.Any(e => e.id == id)).GetValueOrDefault();
+        }
+
+
+        public static DateTime ToUTC8()
+        {
+            // Get the current date and time
+            DateTime localTime = DateTime.Now;
+
+            // Define the target time zone (UTC+8)
+            TimeZoneInfo targetTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Singapore Standard Time");  // Replace with your desired time zone ID if needed
+
+            // Convert local time to UTC+8 time
+            DateTime utcPlus8Time = TimeZoneInfo.ConvertTimeToUtc(localTime, targetTimeZone);
+
+            return utcPlus8Time;
         }
     }
 }
