@@ -20,6 +20,6 @@ namespace SolarManagement.Models
         public string EspNum { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime datetimecreated { get; set; }
+        public DateTime? datetimecreated { get; set; }
     }
 }

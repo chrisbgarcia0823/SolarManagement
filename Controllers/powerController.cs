@@ -141,16 +141,18 @@ namespace SolarManagement.Controllers
 
         public static DateTime ToUTC8()
         {
-            // Get the current date and time
-            DateTime localTime = DateTime.Now;
 
-            // Define the target time zone (UTC+8)
-            TimeZoneInfo targetTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Singapore Standard Time");  // Replace with your desired time zone ID if needed
+            // Get the time zone information for the Philippines (Asia/Manila)
+            TimeZoneInfo philippinesZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila");
 
-            // Convert local time to UTC+8 time
-            DateTime utcPlus8Time = TimeZoneInfo.ConvertTimeToUtc(localTime, targetTimeZone);
+            // Get the current UTC time
+            DateTime utcDateTime = DateTime.UtcNow;
 
-            return utcPlus8Time;
+            // Convert the UTC time to Philippines time (Asia/Manila)
+            DateTime philippinesDateTime = TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, philippinesZone);
+
+            return philippinesDateTime;
+
         }
     }
 }
