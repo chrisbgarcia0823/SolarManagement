@@ -27,7 +27,7 @@ namespace SolarManagement.Controllers
             return View();
         }
 
- [HttpGet]
+        [HttpGet]
         [Route("[controller]/[action]/{espNum}")]
         public async Task<ActionResult<IEnumerable<powertbl>>> LoadPowerData(string espNum)
         {
