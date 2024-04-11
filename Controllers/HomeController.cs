@@ -3,6 +3,7 @@ using SolarManagement.Models;
 using System.Diagnostics;
 using SolarManagement.Data;
 using Microsoft.EntityFrameworkCore;
+using SolarManagement.ViewModel;
 
 namespace SolarManagement.Controllers
 {
@@ -29,13 +30,14 @@ namespace SolarManagement.Controllers
 
         [HttpGet]
         [Route("[controller]/[action]/{espNum}")]
-        public async Task<ActionResult<IEnumerable<powertbl>>> LoadPowerData(string espNum)
+        public async Task<ActionResult<IEnumerable<LoadData>>> LoadPowerData(string espNum)
         {
             var query = from data in _context.powertbl
                         where data.EspNum.ToLower() == espNum.ToLower()
-                        select new powertbl
+                        select new LoadData
                         {
-                            datetimecreated = data.datetimecreated,
+                            TimeData = data.datetimecreated.Value.ToString("HH:mm"),
+                            DateData = data.datetimecreated.Value.ToString("MMM-dd-yyyy"),
                             Ampere = data.Ampere,
                             volt = data.volt,
                             power = data.power,

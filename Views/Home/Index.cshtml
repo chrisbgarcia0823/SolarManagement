@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
-    Layout = "~/Views/Shared/AdminLTE/_UserLayout.cshtml";
+    Layout = "~/Views/Shared/AdminLTE/_Layout.cshtml";
 }
 
 @section Styles 
@@ -83,9 +83,7 @@
 {
     @*FLOT CHART FOR LIVE CHART*@
     <script src="~/plugins/flot/jquery.flot.js"></script>
-
     <script src="~/plugins/flot/plugins/jquery.flot.resize.js"></script>
-
     <script>
         $(function () {
             /*
@@ -194,7 +192,7 @@
     @*FOR CHART JS*@
     <script src="~/plugins/chart.js/Chart.min.js"></script>
 
-    @*ITEMS BELOW SAFETY STOCKS*@
+    @*LINE CHARTS*@
     <script>
         $(async function () {
             //FOR ALERT
@@ -212,6 +210,7 @@
             let date = [];
             let power = [];
             let voltage = [];
+            let currentDate = new Date().toJSON().slice(0, 10);
 
             if(Data.status === 200) //status success
             {
@@ -220,7 +219,7 @@
                 //get the labels (equivalent to the item number)
                 for(i=0; i < jsonData.length; i++)
                 {
-                    date.push(jsonData[i].datetimecreated.toString()); //adding new data to array
+                    date.push(jsonData[i].timeData.toString()); //adding new data to array
                     power.push(jsonData[i].power); //adding new data to array
                     voltage.push(jsonData[i].volt);
                 };
@@ -243,7 +242,7 @@
                 labels: date,
                 datasets: [
                     {
-                        label: 'Power Data', //THIS WILL BE THE SHOWN WHEN HOVER (EXAPLE: Power Data: 2)
+                        label: `Power Data as of ${currentDate}`, //THIS WILL BE THE SHOWN WHEN HOVER (EXAPLE: Power Data: 2)
                         data: power, //THIS WILL BE THE DATA ON THE PLOT
                         fill: false,
                         borderColor: 'rgb(75, 192, 192)',
