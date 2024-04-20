@@ -1,10 +1,10 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "ESP1";
     Layout = "~/Views/Shared/AdminLTE/_Layout.cshtml";
 }
 
-@section Styles 
-{
+@section Styles
+    {
 
     @*FOR ALERTS*@
     <link href="~/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
@@ -19,7 +19,7 @@
 
 <div class="card card-primary">
     <div class="card-header">
-        <h3 class="card-title"><i class="far fa-chart-bar"></i> Critical Load Power Monitoring</h3>
+        <h3 class="card-title"><i class="far fa-chart-bar"></i> ESP1 Load Monitoring</h3>
         <div class="card-tools">
             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                 <i class="fas fa-minus"></i>
@@ -35,7 +35,7 @@
 
 <div class="card card-primary">
     <div class="card-header">
-        <h3 class="card-title"><i class="far fa-chart-bar"></i> Critical Voltage Monitoring</h3>
+        <h3 class="card-title"><i class="far fa-chart-bar"></i> ESP1 Voltage Monitoring</h3>
         <div class="card-tools">
             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                 <i class="fas fa-minus"></i>
@@ -50,7 +50,7 @@
 
 <div class="card card-primary">
     <div class="card-header">
-        <h3 class="card-title"><i class="far fa-chart-bar"></i> Critical Current Monitoring</h3>
+        <h3 class="card-title"><i class="far fa-chart-bar"></i> ESP1 Current Monitoring</h3>
         <div class="card-tools">
             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                 <i class="fas fa-minus"></i>
@@ -64,7 +64,7 @@
 </div>
 
 
-        @*LIVE CHART*@
+@*LIVE CHART*@
 
 @*<div class="row">
     <div class="col-12">
@@ -95,21 +95,21 @@
 
 
 @section Scripts
-{
+    {
     @*FLOT CHART FOR LIVE CHART*@
     <script src="~/plugins/flot/jquery.flot.js"></script>
     <script src="~/plugins/flot/plugins/jquery.flot.resize.js"></script>
     <script>
         $(async function () {
 
-             //FOR ALERT
+            //FOR ALERT
             var Toast = Swal.mixin({
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
                 timer: 2000
             });
-            
+
             //URL ACTION OF THE METHOD TO ACCESS
             const apiUrl = `@Url.Action("LoadPowerData", "Home")/1`;
             // Get the information of the selected item from the controller
@@ -119,20 +119,18 @@
             let voltage = [];
             let currentDate = new Date().toJSON().slice(0, 10);
 
-            if(Data.status === 200) //status success
+            if (Data.status === 200) //status success
             {
                 const jsonData = await Data.json();
                 //console.log(jsonData);
                 //get the labels (equivalent to the item number)
-                for(i=0; i < jsonData.length; i++)
-                {
+                for (i = 0; i < jsonData.length; i++) {
                     date.push(jsonData[i].timeData.toString()); //adding new data to array
                     power.push(jsonData[i].power); //adding new data to array
                     voltage.push(jsonData[i].volt);
                 };
             }
-            else
-            {
+            else {
                 toastr.error("Error Loading Esp1 data error");
             }
 
@@ -252,7 +250,7 @@
                 showConfirmButton: false,
                 timer: 2000
             });
-            
+
             //URL ACTION OF THE METHOD TO ACCESS
             const apiUrl = `@Url.Action("LoadPowerData", "Home")/1`;
             // Get the information of the selected item from the controller
@@ -260,22 +258,22 @@
             let date = [];
             let power = [];
             let voltage = [];
+            let current = [];
             let currentDate = new Date().toJSON().slice(0, 10);
 
-            if(Data.status === 200) //status success
+            if (Data.status === 200) //status success
             {
                 const jsonData = await Data.json();
                 //console.log(jsonData);
                 //get the labels (equivalent to the item number)
-                for(i=0; i < jsonData.length; i++)
-                {
+                for (i = 0; i < jsonData.length; i++) {
                     date.push(jsonData[i].timeData.toString()); //adding new data to array
                     power.push(jsonData[i].power); //adding new data to array
+                    current.push(jsonData[i].ampere); //adding new data to array
                     voltage.push(jsonData[i].volt);
                 };
             }
-            else
-            {
+            else {
                 toastr.error("Error Loading Esp1 data error");
             }
 
@@ -344,7 +342,7 @@
                 datasets: [
                     {
                         label: 'Voltage Data', //THIS WILL BE THE SHOWN WHEN HOVER (EXAPLE: Power Data: 2)
-                        data: power, //THIS WILL BE THE DATA ON THE PLOT
+                        data: voltage, //THIS WILL BE THE DATA ON THE PLOT
                         fill: false,
                         borderColor: 'rgb(210, 52, 46)',
                         tension: 0.1
@@ -355,6 +353,35 @@
             new Chart(lineChartVoltageESP1, {
                 type: 'line',
                 data: lineChartDataVoltageEsp1,
+                options: lineChartOptions
+            });
+
+
+            //-------------
+            //- LINE CHART - AMPERE DATA
+            //-------------
+
+
+            // Get context with jQuery - using jQuery's .get() method.
+            var lineChartCurretESP1 = $('#LineChart-LoadCurrentEsp1').get(0).getContext('2d')
+
+            //generate the chart
+            var lineChartDataCurrentEsp1 = {
+                labels: date,
+                datasets: [
+                    {
+                        label: 'Current Data', //THIS WILL BE THE SHOWN WHEN HOVER (EXAPLE: Power Data: 2)
+                        data: current, //THIS WILL BE THE DATA ON THE PLOT
+                        fill: false,
+                        borderColor: 'rgb(210, 52, 46)',
+                        tension: 0.1
+                    },
+                ]
+            }
+
+            new Chart(lineChartCurretESP1, {
+                type: 'line',
+                data: lineChartDataCurrentEsp1,
                 options: lineChartOptions
             });
 

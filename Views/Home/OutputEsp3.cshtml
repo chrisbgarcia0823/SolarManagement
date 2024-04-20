@@ -1,0 +1,228 @@
+﻿@{
+    ViewData["Title"] = "ESP3";
+    Layout = "~/Views/Shared/AdminLTE/_Layout.cshtml";
+}
+
+@section Styles
+    {
+
+    @*FOR ALERTS*@
+    <link href="~/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/plugins/toastr/toastr.min.css" rel="stylesheet" />
+
+    @*FOR DATATABLE*@
+    <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+}
+
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title"><i class="far fa-chart-bar"></i> ESP3 Load Monitoring</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="chart">
+            <canvas id="LineChart-LoadPowerEsp1" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title"><i class="far fa-chart-bar"></i> ESP3 Voltage Monitoring</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+        <canvas id="LineChart-LoadVoltageEsp1" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block; width: 1084px;" width="1084" height="250" class="chartjs-render-monitor"></canvas>
+    </div>
+</div>
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title"><i class="far fa-chart-bar"></i> ESP3 Current Monitoring</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+        <canvas id="LineChart-LoadCurrentEsp1" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block; width: 1084px;" width="1084" height="250" class="chartjs-render-monitor"></canvas>
+    </div>
+</div>
+
+
+
+@section Scripts
+{
+    @*FOR ALERTS*@
+    <script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <script src="~/plugins/toastr/toastr.min.js"></script>
+
+    @*FOR CHART JS*@
+    <script src="~/plugins/chart.js/Chart.min.js"></script>
+
+    @*LINE CHARTS*@
+    <script>
+        $(async function () {
+            //FOR ALERT
+            var Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+
+            //URL ACTION OF THE METHOD TO ACCESS
+            const apiUrl = `@Url.Action("LoadPowerData", "Home")/3`;
+            // Get the information of the selected item from the controller
+            const Data = await fetch(apiUrl);
+            let date = [];
+            let power = [];
+            let voltage = [];
+            let current = [];
+            let currentDate = new Date().toJSON().slice(0, 10);
+
+            if (Data.status === 200) //status success
+            {
+                const jsonData = await Data.json();
+                //console.log(jsonData);
+                //get the labels (equivalent to the item number)
+                for (i = 0; i < jsonData.length; i++) {
+                    date.push(jsonData[i].timeData.toString()); //adding new data to array
+                    power.push(jsonData[i].power); //adding new data to array
+                    current.push(jsonData[i].ampere); //adding new data to array
+                    voltage.push(jsonData[i].volt);
+                };
+            }
+            else {
+                toastr.error("Error Loading Esp1 data error");
+            }
+
+            //-------------
+            //- LINE CHART - POWER DATA
+            //-------------
+
+
+            // Get context with jQuery - using jQuery's .get() method.
+            var lineChartPowerESP1 = $('#LineChart-LoadPowerEsp1').get(0).getContext('2d')
+
+            //generate the chart
+            var lineChartDataPowerEsp1 = {
+                labels: date,
+                datasets: [
+                    {
+                        label: `Power Data as of ${currentDate}`, //THIS WILL BE THE SHOWN WHEN HOVER (EXAPLE: Power Data: 2)
+                        data: power, //THIS WILL BE THE DATA ON THE PLOT
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    },
+                ]
+            }
+
+            var lineChartOptions = {
+                maintainAspectRatio: false,
+                responsive: true,
+                legend: {
+                    display: true
+                },
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            display: true,
+                        }
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            display: true,
+                        }
+                    }]
+                },
+                fill: false
+            }
+
+
+            new Chart(lineChartPowerESP1, {
+                type: 'line',
+                data: lineChartDataPowerEsp1,
+                options: lineChartOptions
+            });
+
+
+            //-------------
+            //- LINE CHART - VOLTAGE DATA
+            //-------------
+
+
+            // Get context with jQuery - using jQuery's .get() method.
+            var lineChartVoltageESP1 = $('#LineChart-LoadVoltageEsp1').get(0).getContext('2d')
+
+            //generate the chart
+            var lineChartDataVoltageEsp1 = {
+                labels: date,
+                datasets: [
+                    {
+                        label: 'Voltage Data', //THIS WILL BE THE SHOWN WHEN HOVER (EXAPLE: Power Data: 2)
+                        data: voltage, //THIS WILL BE THE DATA ON THE PLOT
+                        fill: false,
+                        borderColor: 'rgb(210, 52, 46)',
+                        tension: 0.1
+                    },
+                ]
+            }
+
+            new Chart(lineChartVoltageESP1, {
+                type: 'line',
+                data: lineChartDataVoltageEsp1,
+                options: lineChartOptions
+            });
+
+
+            //-------------
+            //- LINE CHART - AMPERE DATA
+            //-------------
+
+
+            // Get context with jQuery - using jQuery's .get() method.
+            var lineChartCurretESP1 = $('#LineChart-LoadCurrentEsp1').get(0).getContext('2d')
+
+            //generate the chart
+            var lineChartDataCurrentEsp1 = {
+                labels: date,
+                datasets: [
+                    {
+                        label: 'Current Data', //THIS WILL BE THE SHOWN WHEN HOVER (EXAPLE: Power Data: 2)
+                        data: current, //THIS WILL BE THE DATA ON THE PLOT
+                        fill: false,
+                        borderColor: 'rgb(210, 52, 46)',
+                        tension: 0.1
+                    },
+                ]
+            }
+
+            new Chart(lineChartCurretESP1, {
+                type: 'line',
+                data: lineChartDataCurrentEsp1,
+                options: lineChartOptions
+            });
+
+
+        });
+
+
+
+    </script>
+}

@@ -9,13 +9,6 @@ namespace SolarManagement.Controllers
 {
     public class HomeController : Controller
     {
-        //private readonly ILogger<HomeController> _logger;
-
-        //public HomeController(ILogger<HomeController> logger)
-        //{
-        //    _logger = logger;
-        //}
-
         private readonly SolarManagementContext _context;
 
         public HomeController(SolarManagementContext context)
@@ -24,6 +17,21 @@ namespace SolarManagement.Controllers
         }
 
         public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult OutputEsp1()
+        {
+            return View();
+        }
+
+        public IActionResult OutputEsp2()
+        {
+            return View();
+        }
+
+        public IActionResult OutputEsp3()
         {
             return View();
         }
