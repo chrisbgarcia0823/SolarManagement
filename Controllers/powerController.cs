@@ -32,14 +32,18 @@ namespace SolarManagement.Controllers
         }
 
         // GET: api/power/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<powertbl>> Getpower(int id)
+        [HttpGet]
+        [Route("[controller]/[action]/{espNum}")]
+        public async Task<ActionResult<List<powertbl>>> Getpower(string espNum)
         {
             if (_context.powertbl == null)
             {
                 return NotFound();
             }
-            var power = await _context.powertbl.FindAsync(id);
+            
+            var powerQuery = from p in _context.powertbl where p.EspNum.ToLower() == espNum.ToLower() select p;
+
+            var power = await powerQuery.ToListAsync();
 
             if (power == null)
             {
@@ -49,51 +53,7 @@ namespace SolarManagement.Controllers
             return power;
         }
 
-        // PUT: api/power/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Putpower(int id, powertbl power)
-        {
-            if (id != power.id)
-            {
-                return BadRequest();
-            }
 
-            _context.Entry(power).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!powerExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/power
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<powertbl>> Postpower(powertbl power)
-        {
-            if (_context.powertbl == null)
-            {
-                return Problem("Entity set 'SolarManagementContext.power'  is null.");
-            }
-            _context.powertbl.Add(power);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("Getpower", new { id = power.id }, power);
-        }
 
         [Route("[controller]/[action]/{volt}/{current}/{power}/{espNum}")]
         public async Task<ActionResult<powertbl>> InsertData(decimal volt, decimal current, decimal power, string espNum)
@@ -113,31 +73,7 @@ namespace SolarManagement.Controllers
             return CreatedAtAction("Getpower", new { id = newPOwer.id }, newPOwer);
         }
 
-        // DELETE: api/power/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Deletepower(int id)
-        {
-            if (_context.powertbl == null)
-            {
-                return NotFound();
-            }
-            var power = await _context.powertbl.FindAsync(id);
-            if (power == null)
-            {
-                return NotFound();
-            }
-
-            _context.powertbl.Remove(power);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool powerExists(int id)
-        {
-            return (_context.powertbl?.Any(e => e.id == id)).GetValueOrDefault();
-        }
-
+      
 
         public static DateTime ToUTC8()
         {
