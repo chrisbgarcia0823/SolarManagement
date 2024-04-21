@@ -19,7 +19,7 @@ namespace SolarManagement.Controllers
             _context = context;
         }
 
-        // GET: api/power
+
         [HttpGet]
         [Route("[controller]/[action]")]
         public async Task<ActionResult<IEnumerable<powertbl>>> Getpower()
@@ -31,7 +31,6 @@ namespace SolarManagement.Controllers
             return await _context.powertbl.ToListAsync();
         }
 
-        // GET: api/power/5
         [HttpGet]
         [Route("[controller]/[action]/{espNum}")]
         public async Task<ActionResult<List<powertbl>>> Getpower(string espNum)
