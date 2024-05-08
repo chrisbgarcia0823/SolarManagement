@@ -17,6 +17,7 @@
 }
 
 
+
 <div class="card card-primary">
     <div class="card-header">
         <h3 class="card-title"><i class="far fa-chart-bar"></i> Critical Load Power Monitoring</h3>
@@ -245,6 +246,16 @@
     @*LINE CHARTS*@
     <script>
         $(async function () {
+            //useful link - https://stackoverflow.com/questions/74280609/how-to-make-chart-js-display-values-in-real-time
+            //Variables
+            let date = [];
+            let power = [];
+            let voltage = [];
+            let current = [];
+            let updateTime = 1 * 1000; //1seconds
+            let currentDate = new Date().toJSON().slice(0, 10);
+
+
             //FOR ALERT
             var Toast = Swal.mixin({
                 toast: true,
@@ -253,31 +264,26 @@
                 timer: 2000
             });
             
-            //URL ACTION OF THE METHOD TO ACCESS
-            const apiUrl = `@Url.Action("LoadPowerData", "Home")/1`;
-            // Get the information of the selected item from the controller
-            const Data = await fetch(apiUrl);
-            let date = [];
-            let power = [];
-            let voltage = [];
-            let currentDate = new Date().toJSON().slice(0, 10);
-
-            if(Data.status === 200) //status success
-            {
-                const jsonData = await Data.json();
-                //console.log(jsonData);
-                //get the labels (equivalent to the item number)
-                for(i=0; i < jsonData.length; i++)
+                //URL ACTION OF THE METHOD TO ACCESS
+                const apiUrl = `@Url.Action("LoadPowerData", "Home")/1`;
+                // Get the information of the selected item from the controller
+                const Data = await fetch(apiUrl);
+                if (Data.status === 200) //status success
                 {
-                    date.push(jsonData[i].timeData.toString()); //adding new data to array
-                    power.push(jsonData[i].power); //adding new data to array
-                    voltage.push(jsonData[i].volt);
-                };
-            }
-            else
-            {
-                toastr.error("Error Loading Esp1 data error");
-            }
+                    const jsonData = await Data.json();
+                    //console.log(jsonData);
+                    //get the labels (equivalent to the item number)
+                    for (i = 0; i < jsonData.length; i++) {
+                        date.push(jsonData[i].timeData.toString()); //adding new data to array
+                        power.push(jsonData[i].power); //adding new data to array
+                        voltage.push(jsonData[i].volt);
+                        current.push(jsonData[i].ampere);
+                    };
+                }
+                else {
+                    toastr.error("Error Loading Esp1 data error");
+                }
+
 
             //-------------
             //- LINE CHART - POWER DATA
@@ -311,7 +317,8 @@
                     xAxes: [{
                         gridLines: {
                             display: true,
-                        }
+                        },
+                        max: 60,
                     }],
                     yAxes: [{
                         gridLines: {
@@ -323,12 +330,39 @@
             }
 
 
-            new Chart(lineChartPowerESP1, {
+            const myChart = new Chart(lineChartPowerESP1, {
                 type: 'line',
                 data: lineChartDataPowerEsp1,
                 options: lineChartOptions
             });
 
+            async function getNewData()
+            {
+                //URL ACTION OF THE METHOD TO ACCESS
+                const apiUrl = `@Url.Action("LoadNewPowerData", "Home")/1/update`;
+                // Get the information of the selected item from the controller
+                const Data = await fetch(apiUrl);
+                if (Data.status === 200) //status success
+                {
+                    const result = await Data.json();
+                    power.shift(); //remove the first element of the power data
+                    date.shift(); //remove the first element of the date data
+
+                    //insert the fetch data
+                    power.push(result.power);
+                    date.push(result.timeData.toString())
+                }
+                else {
+                    toastr.error("Error Loading Esp1 data error");
+                }
+            }
+
+            // get new data ever 1 minute (1000)
+            setInterval(function () {
+                getNewData();//get the new data
+                myChart.update(); //update the chart
+                console.log("New Data Fetched");
+            }, updateTime);
 
             //-------------
             //- LINE CHART - VOLTAGE DATA
@@ -360,8 +394,6 @@
 
 
         });
-
-
 
     </script>
 

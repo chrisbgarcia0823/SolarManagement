@@ -49,9 +49,34 @@ namespace SolarManagement.Controllers
                             Ampere = data.Ampere,
                             volt = data.volt,
                             power = data.power,
+                            energy = data.energy,
+                            freq = data.freq,
+                            pf = data.pf,
                         };
 
-            return await query.ToListAsync();
+            return await query.Take(60).ToListAsync();
+        }
+
+        [HttpGet]
+        [Route("[controller]/[action]/{espNum}/{update}")]
+        public async Task<ActionResult<LoadData>> LoadNewPowerData(string espNum, string update)
+        {
+            var query = from data in _context.powertbl
+                        where data.EspNum.ToLower() == espNum.ToLower()
+                        orderby data.id ascending
+                        select new LoadData
+                        {
+                            TimeData = data.datetimecreated.Value.ToString("HH:mm"),
+                            DateData = data.datetimecreated.Value.ToString("MMM-dd-yyyy"),
+                            Ampere = data.Ampere,
+                            volt = data.volt,
+                            power = data.power,
+                            energy = data.energy,
+                            freq = data.freq,
+                            pf = data.pf,
+                        };
+
+            return await query.FirstOrDefaultAsync();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

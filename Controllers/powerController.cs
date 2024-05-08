@@ -54,8 +54,8 @@ namespace SolarManagement.Controllers
 
 
 
-        [Route("[controller]/[action]/{volt}/{current}/{power}/{espNum}")]
-        public async Task<ActionResult<powertbl>> InsertData(decimal volt, decimal current, decimal power, string espNum)
+        [Route("[controller]/[action]/{volt}/{current}/{power}/{espNum}/{energy}/{freq}/{pf}")]
+        public async Task<ActionResult<powertbl>> InsertData(decimal volt, decimal current, decimal power, string espNum, decimal energy, decimal freq, decimal pf)
         {
             powertbl newPOwer = new powertbl
             {
@@ -63,6 +63,9 @@ namespace SolarManagement.Controllers
                 Ampere = current,
                 power = power,
                 EspNum = espNum,
+                energy = energy,
+                freq = freq,
+                pf = pf,
                 datetimecreated = ToUTC8(),
             };
 
