@@ -345,19 +345,24 @@
                 if (Data.status === 200) //status success
                 {
                     const result = await Data.json();
-                    power.shift(); //remove the first element of the power data
-                    date.shift(); //remove the first element of the date data
+                    //check if new data by getting the latest time
+                    if (date.at(-1) != result.timeData.toString())
+                    {
+                        power.shift(); //remove the first element of the power data
+                        date.shift(); //remove the first element of the date data
 
-                    //insert the fetch data
-                    power.push(result.power);
-                    date.push(result.timeData.toString())
+                        //insert the fetch data to the last element
+                        power.push(result.power);
+                        date.push(result.timeData.toString())
+                    }
+
                 }
                 else {
                     toastr.error("Error Loading Esp1 data error");
                 }
             }
 
-            // get new data ever 1 minute (1000)
+            // get new data every updateTime(as set above) and update chart
             setInterval(function () {
                 getNewData();//get the new data
                 myChart.update(); //update the chart
