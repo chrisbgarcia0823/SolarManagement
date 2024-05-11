@@ -16,7 +16,21 @@
     <link rel="stylesheet" href="~/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 }
 
-
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title"><i class="far fa-chart-bar"></i>Battery Voltage Monitoring</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="chart">
+            <canvas id="BarChart-Voltages" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+        </div>
+    </div>
+</div>
 
 <div class="card card-primary">
     <div class="card-header">
@@ -65,41 +79,9 @@
 </div>
 
 
-        @*LIVE CHART*@
-
-@*<div class="row">
-    <div class="col-12">
-
-        <div class="card card-primary card-outline">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="far fa-chart-bar"></i>
-                    Interactive Area Chart
-                </h3>
-                <div class="card-tools">
-                    Real time
-                    <div class="btn-group" id="realtime" data-toggle="btn-toggle">
-                        <button type="button" class="btn btn-default btn-sm active" data-toggle="on">On</button>
-                        <button type="button" class="btn btn-default btn-sm" data-toggle="off">Off</button>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="interactive" style="height: 300px;"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>*@
-
 
 @section Scripts
 {
-    @*FLOT CHART FOR LIVE CHART*@
-    <script src="~/plugins/flot/jquery.flot.js"></script>
-    <script src="~/plugins/flot/plugins/jquery.flot.resize.js"></script>
     <script>
         $(async function () {
 
@@ -110,130 +92,114 @@
                 showConfirmButton: false,
                 timer: 2000
             });
-            
-            //URL ACTION OF THE METHOD TO ACCESS
-            const apiUrl = `@Url.Action("LoadPowerData", "Home")/1`;
-            // Get the information of the selected item from the controller
-            const Data = await fetch(apiUrl);
-            let date = [];
-            let power = [];
-            let voltage = [];
-            let currentDate = new Date().toJSON().slice(0, 10);
 
-            if(Data.status === 200) //status success
+            //FOR BATTERY VOLATAGES AND CURRENT MONITORING ---------------------------------------------------------------------------------
+            let batteryVoltages = [];
+            let batteryTemperature = [];
+            let batterNumber = [];
+            let batteryDate = [];
+            let currentTime = new Date().toJSON().slice(0, 10); //convert to current date and get time
+
+            async funtion getVoltages()
             {
-                const jsonData = await Data.json();
-                //console.log(jsonData);
-                //get the labels (equivalent to the item number)
-                for(i=0; i < jsonData.length; i++)
+                const apiUrl = `@Url.Action("GetBatteryData", "Home")`;
+                if (Data.status === 200) //status success
                 {
-                    date.push(jsonData[i].timeData.toString()); //adding new data to array
-                    power.push(jsonData[i].power); //adding new data to array
-                    voltage.push(jsonData[i].volt);
-                };
-            }
-            else
-            {
-                toastr.error("Error Loading Esp1 data error");
-            }
-
-            /*
-             * Flot Interactive Chart
-             * -----------------------
-             */
-            // We use an inline data source in the example, usually data would
-            // be fetched from a server
-            var data = power,
-                totalPoints = 100
-
-            function getRandomData() {
-
-                if (data.length > 0) {
-                    data = data.slice(1)
-                }
-
-                // Do a random walk
-                while (data.length < totalPoints) {
-
-                    var prev = data.length > 0 ? data[data.length - 1] : 50,
-                        y = prev + Math.random() * 10 - 5
-
-                    if (y < 0) {
-                        y = 0
-                    } else if (y > 100) {
-                        y = 100
-                    }
-
-                    data.push(y)
-                }
-
-                // Zip the generated y values with the x values
-                var res = []
-                for (var i = 0; i < data.length; ++i) {
-                    res.push([i, data[i]])
-                }
-
-                return res
-            }
-
-            var interactive_plot = $.plot('#interactive', [
-                {
-                    data: getRandomData(),
-                }
-            ],
-                {
-                    grid: {
-                        borderColor: '#f3f3f3',
-                        borderWidth: 1,
-                        tickColor: '#f3f3f3'
-                    },
-                    series: {
-                        color: '#3c8dbc',
-                        lines: {
-                            lineWidth: 2,
-                            show: true,
-                            fill: true,
-                        },
-                    },
-                    yaxis: {
-                        min: 0,
-                        max: 100,
-                        show: true
-                    },
-                    xaxis: {
-                        show: true
-                    }
-                }
-            )
-
-            var updateInterval = 500 //Fetch data ever x milliseconds
-            var realtime = 'on' //If == to on then fetch data every x seconds. else stop fetching
-            function update() {
-
-                interactive_plot.setData([getRandomData()])
-
-                // Since the axes don't change, we don't need to call plot.setupGrid()
-                interactive_plot.draw()
-                if (realtime === 'on') {
-                    setTimeout(update, updateInterval)
-                }
-            }
-
-            //INITIALIZE REALTIME DATA FETCHING
-            if (realtime === 'on') {
-                update()
-            }
-            //REALTIME TOGGLE
-            $('#realtime .btn').click(function () {
-                if ($(this).data('toggle') === 'on') {
-                    realtime = 'on'
+                    const result = await Data.json();
+                    //iterate to get the result
+                    for (i = 0; i < result.length; i++) {
+                        batteryVoltages.push(result[i].voltage);
+                        batteryTemperature.push(result[i].temperature);
+                        currentTime.push(jsonData[i].timeData.toString());
+                    };
                 }
                 else {
-                    realtime = 'off'
+                    toastr.error("Error Loading Esp1 data error");
                 }
-                update()
-            })
-        })
+            }
+
+            //-------------
+            //- BAR CHART - VOLTAGES DATA
+            //-------------
+
+
+            // Get context with jQuery - using jQuery's .get() method.
+            var lineChartPowerESP1 = $('BarChart-Voltages').get(0).getContext('2d')
+
+            //generate the chart
+            var voltageChart = {
+                labels: batteryNumber,
+                datasets: [
+                    {
+                        label: `Power Data as of ${currentTime}`, //THIS WILL BE THE SHOWN WHEN HOVER (EXAPLE: Power Data: 2)
+                        data: batteryVoltages, //THIS WILL BE THE DATA ON THE PLOT
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    },
+                ]
+            }
+
+            var lineChartOptions = {
+                maintainAspectRatio: false,
+                responsive: true,
+                legend: {
+                    display: true
+                },
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            display: true,
+                        },
+                        max: 60,
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            display: true,
+                        }
+                    }]
+                },
+                fill: false
+            }
+
+
+            const myChart = new Chart(lineChartPowerESP1, {
+                type: 'line',
+                data: lineChartDataPowerEsp1,
+                options: lineChartOptions
+            });
+
+
+            //END OF BATTERY VOLTAGES AND CURRENT MONITORING -------------------------------------------------------------------------------
+
+
+            // Get the information of the selected item from the controller
+            const Data = await fetch(apiUrl);
+            let date = []; //all date
+            let power = []; //all power
+            let voltage = []; //all voltage
+            let currentDate = new Date().toJSON().slice(0, 10); //convert to current date and get time
+
+            //GET POWER DATA
+            async function getPowerData() {
+                //URL ACTION OF THE METHOD TO ACCESS
+                const apiUrl = `@Url.Action("LoadPowerData", "Home")/1`;
+
+                if (Data.status === 200) //status success
+                {
+                    const jsonData = await Data.json();
+                    //console.log(jsonData);
+                    //get the labels (equivalent to the item number)
+                    for (i = 0; i < jsonData.length; i++) {
+                        date.push(jsonData[i].timeData.toString()); //adding new data to array
+                        power.push(jsonData[i].power); //adding new data to array
+                        voltage.push(jsonData[i].volt);
+                    };
+                }
+                else {
+                    toastr.error("Error Loading Esp1 data error");
+                }
+            }
     </script>
 
     @*FOR ALERTS*@

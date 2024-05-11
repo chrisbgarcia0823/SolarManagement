@@ -79,6 +79,25 @@ namespace SolarManagement.Controllers
             return await query.FirstOrDefaultAsync();
         }
 
+        [Route("[controller]/[action]")]
+        public async Task<ActionResult<List<BatteryVoltages>>> GetBatteryData()
+        {
+            string sqlQuery = "SELECT * FROM [db3861].[dbo].[vBatteries]";
+            var data = _context.batterytbl.FromSqlRaw(sqlQuery);
+            var batteryVoltages = from battery in data
+                                  select new BatteryVoltages
+                                  {
+                                      Id = battery.id,
+                                      batterNumber = battery.batt,
+                                      voltage = battery.volt,
+                                      temperature = battery.temp,
+                                      TimeData = battery.dttmcreated.Value.ToString("HH:mm"),
+                                      DateData = battery.dttmcreated.Value.ToString("MMM-dd-yyyy"),
+                                  };
+
+            return await batteryVoltages.ToListAsync();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
