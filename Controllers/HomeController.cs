@@ -63,7 +63,7 @@ namespace SolarManagement.Controllers
         {
             var query = from data in _context.powertbl
                         where data.EspNum.ToLower() == espNum.ToLower()
-                        orderby data.id ascending
+                        orderby data.id descending
                         select new LoadData
                         {
                             TimeData = data.datetimecreated.Value.ToString("HH:mm"),

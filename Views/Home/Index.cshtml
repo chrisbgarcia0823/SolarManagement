@@ -183,7 +183,7 @@
             //GET POWER DATA
             async function getPowerData() {
                 //URL ACTION OF THE METHOD TO ACCESS
-                const apiUrl = `@Url.Action("LoadPowerData", "Home")/1`;
+                const apiUrl = `@Url.Action("LoadPowerData", "Home")/2`;
 
                 if (Data.status === 200) //status success
                 {
@@ -218,8 +218,8 @@
             let power = [];
             let voltage = [];
             let current = [];
-            let updateTime = 1 * 1000; //1seconds
-            let currentDate = new Date().toJSON().slice(0, 10);
+            let updateTime =  30* 1000; //1seconds
+            let currentDate = '';
 
 
             //FOR ALERT
@@ -231,12 +231,13 @@
             });
             
                 //URL ACTION OF THE METHOD TO ACCESS
-                const apiUrl = `@Url.Action("LoadPowerData", "Home")/1`;
+                const apiUrl = `@Url.Action("LoadPowerData", "Home")/2`;
                 // Get the information of the selected item from the controller
                 const Data = await fetch(apiUrl);
                 if (Data.status === 200) //status success
                 {
                     const jsonData = await Data.json();
+                    currentDate = jsonData[59].dataDate;
                     //console.log(jsonData);
                     //get the labels (equivalent to the item number)
                     for (i = 0; i < jsonData.length; i++) {
@@ -305,7 +306,7 @@
             async function getNewData()
             {
                 //URL ACTION OF THE METHOD TO ACCESS
-                const apiUrl = `@Url.Action("LoadNewPowerData", "Home")/1/update`;
+                const apiUrl = `@Url.Action("LoadNewPowerData", "Home")/2/update`;
                 // Get the information of the selected item from the controller
                 const Data = await fetch(apiUrl);
                 if (Data.status === 200) //status success

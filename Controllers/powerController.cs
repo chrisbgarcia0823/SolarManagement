@@ -40,9 +40,9 @@ namespace SolarManagement.Controllers
                 return NotFound();
             }
             
-            var powerQuery = from p in _context.powertbl where p.EspNum.ToLower() == espNum.ToLower() select p;
+            var powerQuery = from p in _context.powertbl where p.EspNum.ToLower() == espNum.ToLower() orderby p.id descending select p;
 
-            var power = await powerQuery.ToListAsync();
+            var power = await powerQuery.Take(60).ToListAsync();
 
             if (power == null)
             {
