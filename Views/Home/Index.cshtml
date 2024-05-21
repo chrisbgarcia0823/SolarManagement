@@ -100,7 +100,7 @@
             let batteryDate = [];
             let currentTime = new Date().toJSON().slice(0, 10); //convert to current date and get time
 
-            async funtion getVoltages()
+            async function getVoltages()
             {
                 const apiUrl = `@Url.Action("GetBatteryData", "Home")`;
                 if (Data.status === 200) //status success
@@ -124,10 +124,10 @@
 
 
             // Get context with jQuery - using jQuery's .get() method.
-            var lineChartPowerESP1 = $('BarChart-Voltages').get(0).getContext('2d')
+            var barChartVoltages = $('BarChart-Voltages').get(0).getContext('2d')
 
             //generate the chart
-            var voltageChart = {
+            var voltageChartData = {
                 labels: batteryNumber,
                 datasets: [
                     {
@@ -140,7 +140,7 @@
                 ]
             }
 
-            var lineChartOptions = {
+            var voltageChartOptions = {
                 maintainAspectRatio: false,
                 responsive: true,
                 legend: {
@@ -163,10 +163,10 @@
             }
 
 
-            const myChart = new Chart(lineChartPowerESP1, {
-                type: 'line',
-                data: lineChartDataPowerEsp1,
-                options: lineChartOptions
+            const myChart = new Chart(barChartVoltages, {
+                type: 'bar',
+                data: voltageChartData,
+                options: voltageChartOptions
             });
 
 
@@ -199,7 +199,7 @@
                 else {
                     toastr.error("Error Loading Esp1 data error");
                 }
-            }
+            )}
     </script>
 
     @*FOR ALERTS*@

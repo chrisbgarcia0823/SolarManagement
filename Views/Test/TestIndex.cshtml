@@ -1,0 +1,169 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/AdminLTE/_Layout.cshtml";
+}
+
+@section Styles
+    {
+
+    @*FOR ALERTS*@
+    <link href="~/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/plugins/toastr/toastr.min.css" rel="stylesheet" />
+
+    @*FOR DATATABLE*@
+    <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+}
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title"><i class="far fa-chart-bar"></i>Battery Voltage Monitoring</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="chart" id="VoltageDiv">
+            <canvas id="BarChart-Voltages" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts
+{
+    <script>
+        $(async function ()
+        {
+
+            //FOR ALERT
+            var Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+
+            //FOR BATTERY VOLATAGES AND CURRENT MONITORING ---------------------------------------------------------------------------------
+            let batteryVoltages = [];
+            let batteryTemperature = [];
+            let batterNumber = [];
+            let batteryDate = [];
+            let currentTime = []; //convert to current date and get time
+            let updateTime = 30 * 1000; //1seconds
+
+            async function getVoltages()
+            {
+                const apiUrl = `@Url.Action("GetBatteryData", "Home")`;
+                const Data = await fetch(apiUrl);
+                if (Data.status === 200) //status success
+                {
+                    const result = await Data.json();
+                    //iterate to get the result
+                    for (i = 0; i < result.length; i++) {
+                        batteryVoltages.push(result[i].voltage);
+                        batteryTemperature.push(result[i].temperature);
+                        currentTime.push(result[i].timeData.toString());
+                        batterNumber.push(result[i].batterNumber)
+                    };
+                }
+                else {
+                    toastr.error("Error Loading Esp1 data error");
+                }
+            }
+
+            //-------------
+            //- BAR CHART - VOLTAGES DATA
+            //-------------
+
+
+            // Get context with jQuery - using jQuery's .get() method.
+            var barChartCanvas = $('#BarChart-Voltages').get(0).getContext('2d'); //this will be my chart
+
+            const ChartData = {
+                labels: batterNumber,
+                datasets: [{
+                    label: 'Battery Voltages',
+                    data: batteryVoltages,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                }]
+            };
+
+            var ChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                datasetFill: false,
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Battery Number'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        ticks: {
+                            beginAtZero: true,
+                            steps: 1,
+                            stepValue: 1,
+                            labelString: 'Voltages'
+                        }
+                    }]
+                },
+            }
+
+            getVoltages();//get the new data
+            const myChart = new Chart(barChartCanvas,
+            {
+                    type: 'bar',
+                    data: ChartData,
+                    options: ChartOptions
+            })
+
+            // get new data every updateTime(as set above) and update chart
+            setInterval(function () {
+                removeData(myChart); //remove the old data
+                getVoltages();//get the new data
+                myChart.update();
+            }, updateTime);
+
+
+            //Removing the old data
+            function removeData(chart) {
+                chart.data.labels.pop();
+                chart.data.datasets.forEach((dataset) => {
+                    dataset.data.pop();
+                });
+
+                //remove the previous data
+                batteryVoltages.pop();
+                batteryTemperature.pop();
+                batterNumber.pop();
+                batteryDate.pop();
+                currentTime.pop();
+
+                //Update the chart
+                chart.update();
+            }
+
+            //END OF BATTERY VOLTAGES AND CURRENT MONITORING -------------------------------------------------------------------------------
+
+        });
+    </script>
+
+
+    @*FOR ALERTS*@
+    <script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <script src="~/plugins/toastr/toastr.min.js"></script>
+
+    @*FOR CHART JS*@
+    <script src="~/plugins/chart.js/Chart.min.js"></script>
+
+
+}
