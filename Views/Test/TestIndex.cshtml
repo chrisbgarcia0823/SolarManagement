@@ -57,25 +57,24 @@
             let currentTime = []; //convert to current date and get time
             let updateTime = 30 * 1000; //1seconds
 
-            async function getVoltages()
+
+            const apiUrl = `@Url.Action("GetBatteryData", "Home")`;
+            const Data = await fetch(apiUrl);
+            if (Data.status === 200) //status success
             {
-                const apiUrl = `@Url.Action("GetBatteryData", "Home")`;
-                const Data = await fetch(apiUrl);
-                if (Data.status === 200) //status success
-                {
-                    const result = await Data.json();
-                    //iterate to get the result
-                    for (i = 0; i < result.length; i++) {
-                        batteryVoltages.push(result[i].voltage);
-                        batteryTemperature.push(result[i].temperature);
-                        currentTime.push(result[i].timeData.toString());
-                        batterNumber.push(result[i].batterNumber)
-                    };
-                }
-                else {
-                    toastr.error("Error Loading Esp1 data error");
-                }
+                const result = await Data.json();
+                //iterate to get the result
+                for (i = 0; i < result.length; i++) {
+                    batteryVoltages.push(result[i].voltage);
+                    batteryTemperature.push(result[i].temperature);
+                    currentTime.push(result[i].timeData.toString());
+                    batterNumber.push(result[i].batterNumber)
+                };
             }
+            else {
+                toastr.error("Error Loading Esp1 data error");
+            }
+            
 
             //-------------
             //- BAR CHART - VOLTAGES DATA
@@ -100,25 +99,31 @@
                 datasetFill: false,
                 scales: {
                     xAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 16
+                        },
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'Battery Number'
-                        }
+                            labelString: 'Battery Number',
+                        },
                     }],
                     yAxes: [{
-                        display: true,
                         ticks: {
                             beginAtZero: true,
-                            steps: 1,
-                            stepValue: 1,
-                            labelString: 'Voltages'
-                        }
+                            max: 4
+                        },
+                        display: true,
+                        scaleLabel:
+                        {
+                            display: true,
+                            labelString: 'Volts',
+                        },
                     }]
                 },
             }
 
-            getVoltages();//get the new data
             const myChart = new Chart(barChartCanvas,
             {
                     type: 'bar',
@@ -126,31 +131,34 @@
                     options: ChartOptions
             })
 
+            async function getNewData() 
+            {
+                //URL ACTION OF THE METHOD TO ACCESS
+                const apiUrl = `@Url.Action("GetBatteryData", "Home")`;
+                // Get the information of the selected item from the controller
+                const Data = await fetch(apiUrl);
+                if (Data.status === 200) //status success
+                {
+                    const result = await Data.json();
+                    for (i = 0; i < result.length; i++) {
+                        batteryVoltages.push(result[i].voltage);
+                        batteryTemperature.push(result[i].temperature);
+                        currentTime.push(result[i].timeData.toString());
+                        batterNumber.push(result[i].batterNumber)
+                    };
+
+                }
+                else {
+                    toastr.error("Error Loading Esp1 data error");
+                }
+            }
+
             // get new data every updateTime(as set above) and update chart
             setInterval(function () {
-                removeData(myChart); //remove the old data
-                getVoltages();//get the new data
+                getNewData();
                 myChart.update();
+                console.log('new data fetch')
             }, updateTime);
-
-
-            //Removing the old data
-            function removeData(chart) {
-                chart.data.labels.pop();
-                chart.data.datasets.forEach((dataset) => {
-                    dataset.data.pop();
-                });
-
-                //remove the previous data
-                batteryVoltages.pop();
-                batteryTemperature.pop();
-                batterNumber.pop();
-                batteryDate.pop();
-                currentTime.pop();
-
-                //Update the chart
-                chart.update();
-            }
 
             //END OF BATTERY VOLTAGES AND CURRENT MONITORING -------------------------------------------------------------------------------
 
