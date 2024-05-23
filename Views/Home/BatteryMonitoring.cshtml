@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Battery Monitoring";
     Layout = "~/Views/Shared/AdminLTE/_Layout.cshtml";
 }
 
@@ -28,6 +28,22 @@
     <div class="card-body">
         <div class="chart" id="VoltageDiv">
             <canvas id="BarChart-Voltages" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="card card-success">
+    <div class="card-header">
+        <h3 class="card-title"><i class="far fa-chart-bar"></i>Battery Temperature Monitoring</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="chart" id="TemperatureDiv">
+            <canvas id="BarChart-Temperature" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
         </div>
     </div>
 </div>
@@ -61,8 +77,7 @@
 @section Scripts
 {
     <script>
-        $(async function ()
-        {
+        $(async function () {
 
             //FOR ALERT
             var Toast = Swal.mixin({
@@ -95,9 +110,9 @@
                 };
             }
             else {
-                toastr.error("Fetch data error");
+                toastr.error("Error fetching data");
             }
-            
+
 
             //-------------
             //- BAR CHART - VOLTAGES DATA
@@ -105,18 +120,18 @@
 
 
             // Get context with jQuery - using jQuery's .get() method.
-            var barChartCanvas = $('#BarChart-Voltages').get(0).getContext('2d'); //this will be my chart
+            var barChartCanvas_Voltage = $('#BarChart-Voltages').get(0).getContext('2d'); //this will be my chart
 
-            const ChartData = {
+            const ChartData_Voltage = {
                 labels: batterNumber,
                 datasets: [{
                     label: 'Battery Voltages',
                     data: batteryVoltages,
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    backgroundColor: 'rgba(51, 51, 225, 0.5)',
                 }]
             };
 
-            var ChartOptions = {
+            var ChartOptions_Voltage = {
                 responsive: true,
                 maintainAspectRatio: false,
                 datasetFill: false,
@@ -143,28 +158,79 @@
                             display: true,
                             labelString: 'Volts',
                         },
-                    }],
-                    // Interaction options for click handling
-                    interaction: {
-                        mode: 'nearest',
-                        axis: 'y',
-                        intersect: true
-                    },
+                    }]
                 },
             }
 
-            const myChart = new Chart(barChartCanvas,
-            {
+            const myChart_Voltage = new Chart(barChartCanvas_Voltage,
+                {
                     type: 'bar',
-                    data: ChartData,
-                    options: ChartOptions
-            })
+                    data: ChartData_Voltage,
+                    options: ChartOptions_Voltage
+                })
+
+            //-------------
+            //- BAR CHART - TEMPERATURE DATA
+            //-------------
+
+            // Get context with jQuery - using jQuery's .get() method.
+            var barChartCanvas_Temperature = $('#BarChart-Temperature').get(0).getContext('2d'); //this will be my chart
+
+            const ChartData_Temperature = {
+                labels: batterNumber,
+                datasets: [{
+                    label: 'Battery Temperature',
+                    data: batteryTemperature,
+                    backgroundColor: 'rgba(0, 204, 0, 0.5)',
+                }]
+            };
+
+            var ChartOptions_Temperature = {
+                responsive: true,
+                maintainAspectRatio: false,
+                datasetFill: false,
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 16
+                        },
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Battery Number',
+                        },
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 50
+                        },
+                        display: true,
+                        scaleLabel:
+                        {
+                            display: true,
+                            labelString: 'Celcius',
+                        },
+                    }]
+                },
+            }
+
+            const myChart_Temperature = new Chart(barChartCanvas_Temperature,
+                {
+                    type: 'bar',
+                    data: ChartData_Temperature,
+                    options: ChartOptions_Temperature
+                })
 
 
-            //FOR UPDATING THE CHART --------------------------------------------------------------------------------------------------
+             //GET NEW DATA ---------------------------------------------------------------------------------------
+
             async function getNewData() 
             {
+                //clear the previous values
                 batteryVoltages = [];
+                batteryTemperature = [];
 
                 //URL ACTION OF THE METHOD TO ACCESS
                 const apiUrl = `@Url.Action("GetBatteryData", "Home")`;
@@ -182,19 +248,22 @@
 
                 }
                 else {
-                    toastr.error("Fetch data error");
+                    toastr.error("Error fectching data");
                 }
             }
 
             // get new data every updateTime(as set above) and update chart
             setInterval(async function () {
                 await getNewData();
-                myChart.data.datasets[0].data = batteryVoltages;
-                myChart.update();
-                console.log('new data fetch')
+                myChart_Voltage.data.datasets[0].data = batteryVoltages;
+                myChart_Temperature.data.datasets[0].data = batteryTemperature;
+                myChart_Voltage.update();
+                myChart_Temperature.update();
+                console.log('New Data Fetched')
             }, updateTime);
 
             //END UPDATING THE CHART --------------------------------------------------------------------------------------------------
+
 
             //FOR CLICK AND OPEN MODAL ---------------------------------------------------------------------------------------------------------------
             //for modal
@@ -203,8 +272,8 @@
             const title = document.getElementById('Title');
 
             // Event listener for chart click events
-            barChartCanvas.canvas.addEventListener('click', (event) => {
-                const clickedElements = myChart.getElementsAtEvent(event);
+            barChartCanvas_Voltage.canvas.addEventListener('click', (event) => {
+                const clickedElements = myChart_Voltage.getElementsAtEvent(event);
 
                 if (clickedElements.length > 0) {
                     const element = clickedElements[0]; // Get the first clicked element
@@ -224,12 +293,13 @@
             });
 
             //END OF BATTERY VOLTAGES AND CURRENT MONITORING -------------------------------------------------------------------------------
+
         });
     </script>
 
     @*FETCHING THE DATA OF THE BATTERY VOLTAGE (FOR DISPLAYING THE LIVE DATA WHEN BAR IS CLICKED IN THE CHART)*@
     <script>
-        async function GetLiveVoltageData (batteryNumber) {
+        async function GetLiveVoltageData(batteryNumber) {
             //FOR ALERT
             var Toast = Swal.mixin({
                 toast: true,
@@ -310,22 +380,21 @@
 
 
             //FOR UPDATING THE CHART --------------------------------------------------------------------------------------------------
-            async function getNewData() 
-            {
+            async function getNewData() {
                 //URL ACTION OF THE METHOD TO ACCESS
-                const apiUrl = `@Url.Action("GetBatteryData", "Home")/${batteryNumber}`;
+                const apiUrl2 = `@Url.Action("GetBatteryData", "Home")/${batteryNumber}`;
                 // Get the information of the selected item from the controller
-                const Data = await fetch(apiUrl);
-                if (Data.status === 200) //status success
+                const Data2 = await fetch(apiUrl2);
+                if (Data2.status === 200) //status success
                 {
-                    const result = await Data.json();
-                    if (timeData.at(-1) != result.timeData.toString()) {
-                        batterVoltage.shift(); //remove the first element of the voltage data
+                    const result2 = await Data2.json();
+                    if (timeData.at(-1) != result2.timeData) {
+                        batteryVoltage.shift(); //remove the first element of the voltage data
                         timeData.shift(); //remove the first element of the time data
 
                         //insert the fetch data to the last element
-                        batterVoltage.push(result.voltage);
-                        timeData.push(result.timeData.toString())
+                        batteryVoltage.push(result2.voltage);
+                        timeData.push(result2.timeData)
                     }
 
                 }

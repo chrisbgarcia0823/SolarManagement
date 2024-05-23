@@ -21,6 +21,22 @@ namespace SolarManagement.Controllers
             return View();
         }
 
+        public IActionResult BatteryMonitoring()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> TableView()
+        {
+            var data = await(from batt in _context.batterytbl orderby batt.id descending select batt).ToListAsync();
+            return View(data);
+        }
+
+        public IActionResult LiveData()
+        {
+            return View();
+        }
+
         public IActionResult OutputEsp1()
         {
             return View();
@@ -96,6 +112,20 @@ namespace SolarManagement.Controllers
                                   };
 
             return await batteryVoltages.ToListAsync();
+        }
+
+        [Route("[controller]/[action]/{batteryNum}")]
+        public async Task<ActionResult<List<BatteryVoltages>>> GetBatteryData(int batteryNum)
+        {
+            var batteryVoltages = from battery in _context.batterytbl where battery.batt == batteryNum orderby battery.id descending
+                                  select new BatteryVoltages
+                                  {
+                                      voltage = battery.volt,
+                                      TimeData = battery.dttmcreated.Value.ToString("HH:mm"),
+                                      DateData = battery.dttmcreated.Value.ToString("MMM-dd-yyyy"),
+                                  };
+
+            return await batteryVoltages.Take(60).ToListAsync();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
