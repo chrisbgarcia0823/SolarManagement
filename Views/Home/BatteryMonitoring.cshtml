@@ -259,7 +259,7 @@
                 myChart_Temperature.data.datasets[0].data = batteryTemperature;
                 myChart_Voltage.update();
                 myChart_Temperature.update();
-                console.log('New Data Fetched')
+                console.log('Bar Chart Updated')
             }, updateTime);
 
             //END UPDATING THE CHART --------------------------------------------------------------------------------------------------
@@ -283,7 +283,7 @@
                     const voltage = batteryVoltages[labelIndex];
 
                     // Update modal content
-                    modalContent.textContent = `You clicked on "${batteryNumber}" with a value of ${voltage}`;
+                    //modalContent.textContent = `You clicked on "${batteryNumber}" with a value of ${voltage}`;
                     title.textContent = `Batter ${batteryNumber} Live Voltage Data`;
                     GetLiveVoltageData(batteryNumber);
 
@@ -310,8 +310,8 @@
 
             //FOR BATTERY VOLATAGES AND CURRENT MONITORING ---------------------------------------------------------------------------------
             let batteryVoltage = [];
-            let timeData = [];
-            let updateTime = 30 * 1000; //1seconds
+            let time = [];
+            let updateTime = 1 * 10000; //1seconds
 
 
             const apiUrl = `@Url.Action("GetBatteryData", "Home")/${batteryNumber}`;
@@ -322,7 +322,7 @@
                 //iterate to get the result
                 for (i = 0; i < result.length; i++) {
                     batteryVoltage.push(result[i].voltage);
-                    timeData.push(result[i].timeData.toString());
+                    time.push(result[i].timeData.toString());
                 };
             }
             else {
@@ -339,7 +339,7 @@
             var lineChartCanvas = $('#LiveData-Voltages').get(0).getContext('2d'); //this will be my chart
 
             const ChartData = {
-                labels: timeData,
+                labels: time,
                 datasets: [{
                     label: 'Live Battery Voltage Data',
                     data: batteryVoltage,
@@ -377,24 +377,24 @@
                     data: ChartData,
                     options: ChartOptions
                 })
-
+            
 
             //FOR UPDATING THE CHART --------------------------------------------------------------------------------------------------
             async function getNewData() {
                 //URL ACTION OF THE METHOD TO ACCESS
-                const apiUrl2 = `@Url.Action("GetBatteryData", "Home")/${batteryNumber}`;
+                const apiUrl2 = `@Url.Action("LoadNewBatteryData", "Home")/${batteryNumber}/update`;
                 // Get the information of the selected item from the controller
                 const Data2 = await fetch(apiUrl2);
                 if (Data2.status === 200) //status success
                 {
                     const result2 = await Data2.json();
-                    if (timeData.at(-1) != result2.timeData) {
+                    if (time.at(-1) != result2.timeData.toString()) {
                         batteryVoltage.shift(); //remove the first element of the voltage data
-                        timeData.shift(); //remove the first element of the time data
+                        time.shift(); //remove the first element of the time data
 
                         //insert the fetch data to the last element
                         batteryVoltage.push(result2.voltage);
-                        timeData.push(result2.timeData)
+                        time.push(result2.timeData.toString())
                     }
 
                 }
@@ -407,7 +407,7 @@
             setInterval(async function () {
                 getNewData();
                 myChart.update();
-                console.log('new data fetch')
+                console.log('Line Chart Updated')
             }, updateTime);
 
             //END UPDATING THE CHART --------------------------------------------------------------------------------------------------

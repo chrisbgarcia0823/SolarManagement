@@ -73,6 +73,7 @@ namespace SolarManagement.Controllers
             return await query.Take(60).ToListAsync();
         }
 
+        //FETCH TO INDIVIDUALLY GET AN UPDATE ON THE DATA
         [HttpGet]
         [Route("[controller]/[action]/{espNum}/{update}")]
         public async Task<ActionResult<LoadData>> LoadNewPowerData(string espNum, string update)
@@ -117,7 +118,7 @@ namespace SolarManagement.Controllers
         [Route("[controller]/[action]/{batteryNum}")]
         public async Task<ActionResult<List<BatteryVoltages>>> GetBatteryData(int batteryNum)
         {
-            var batteryVoltages = from battery in _context.batterytbl where battery.batt == batteryNum orderby battery.id descending
+            var batteryVoltages = from battery in _context.batterytbl where battery.batt == batteryNum
                                   select new BatteryVoltages
                                   {
                                       voltage = battery.volt,
@@ -126,6 +127,23 @@ namespace SolarManagement.Controllers
                                   };
 
             return await batteryVoltages.Take(60).ToListAsync();
+        }
+
+        //FETCH TO INDIVIDUALLY GET AN UPDATE ON THE DATA
+        [Route("[controller]/[action]/{batteryNum}/{update}")]
+        public async Task<ActionResult<BatteryVoltages>> LoadNewBatteryData(int batteryNum, string update)
+        {
+            var batteryVoltages = from battery in _context.batterytbl
+                                  where battery.batt == batteryNum
+                                  orderby battery.id descending
+                                  select new BatteryVoltages
+                                  {
+                                      voltage = battery.volt,
+                                      TimeData = battery.dttmcreated.Value.ToString("HH:mm"),
+                                      DateData = battery.dttmcreated.Value.ToString("MMM-dd-yyyy"),
+                                  };
+
+            return await batteryVoltages.FirstOrDefaultAsync();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
