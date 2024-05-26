@@ -75,7 +75,7 @@
 </div>
 
 @section Scripts
-{
+    {
     <script>
         $(async function () {
 
@@ -388,35 +388,35 @@
 
 
             //FOR UPDATING THE CHART --------------------------------------------------------------------------------------------------
-            //async function getNewData() {
-            //    //URL ACTION OF THE METHOD TO ACCESS
-            //    const apiUrl2 = `@Url.Action("LoadNewBatteryData", "Home")/${batteryNumber}/update`;
-            //    // Get the information of the selected item from the controller
-            //    const Data2 = await fetch(apiUrl2);
-            //    if (Data2.status === 200) //status success
-            //    {
-            //        const result2 = await Data2.json();
-            //        if (timeData.at(-1) != result2.timeData) {
-            //            batteryVoltage.shift(); //remove the first element of the voltage data
-            //            timeData.shift(); //remove the first element of the time data
+            async function getNewData() {
+                //URL ACTION OF THE METHOD TO ACCESS
+                const apiUrl2 = `@Url.Action("LoadNewBatteryData", "Home")/${batteryNumber}/update`;
+                // Get the information of the selected item from the controller
+                const Data2 = await fetch(apiUrl2);
+                if (Data2.status === 200) //status success
+                {
+                    const result2 = await Data2.json();
+                    if (timeData.at(-1) != result2.timeData) {
+                        batteryVoltage.shift(); //remove the first element of the voltage data
+                        timeData.shift(); //remove the first element of the time data
 
-            //            //insert the fetch data to the last element
-            //            batteryVoltage.push(result2.voltage);
-            //            timeData.push(result2.timeData)
-            //        }
+                        //insert the fetch data to the last element
+                        batteryVoltage.push(result2.voltage);
+                        timeData.push(result2.timeData)
+                    }
 
-            //    }
-            //    else {
-            //        toastr.error("Fetch data error");
-            //    }
-            //}
+                }
+                else {
+                    toastr.error("Fetch data error");
+                }
+            }
 
             // get new data every updateTime(as set above) and update chart
-            //setInterval(async function () {
-            //    getNewData();
-            //    myChart.update();
-            //    console.log(`New data is fetched for battery number ${batteryNumber}`);
-            //}, updateTime);
+            setInterval(async function () {
+                getNewData();
+                myChart.update();
+                console.log(`New data is fetched for battery number ${batteryNumber}`);
+            }, updateTime);
 
             //END UPDATING THE CHART --------------------------------------------------------------------------------------------------
         };

@@ -8,5 +8,10 @@ namespace SolarManagement.Controllers
         {
             return View();
         }
+
+        public IActionResult Test2()
+        {
+            return View();
+        }
     }
 }
