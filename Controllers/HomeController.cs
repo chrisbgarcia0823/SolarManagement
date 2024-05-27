@@ -32,8 +32,12 @@ namespace SolarManagement.Controllers
             return View(data);
         }
 
-        public IActionResult LiveData()
+        [HttpGet]
+        [Route("[controller]/[action]/{batterNumber}/{parameter}")]
+        public IActionResult LiveData(int batterNumber, string parameter)
         {
+            TempData["BatteryNumber"] = batterNumber;
+            TempData["Parameter"] = parameter;
             return View();
         }
 
@@ -119,14 +123,17 @@ namespace SolarManagement.Controllers
         public async Task<ActionResult<List<BatteryVoltages>>> GetBatteryData(int batteryNum)
         {
             var batteryVoltages = from battery in _context.batterytbl where battery.batt == batteryNum
+                                  orderby battery.id descending
                                   select new BatteryVoltages
                                   {
+                                      Id = battery.id,
                                       voltage = battery.volt,
+                                      temperature = battery.temp,
                                       TimeData = battery.dttmcreated.Value.ToString("HH:mm"),
                                       DateData = battery.dttmcreated.Value.ToString("MMM-dd-yyyy"),
                                   };
 
-            return await batteryVoltages.Take(60).ToListAsync();
+            return await batteryVoltages.Take(60).OrderBy(data => data.Id).ToListAsync();
         }
 
         //FETCH TO INDIVIDUALLY GET AN UPDATE ON THE DATA
@@ -139,12 +146,14 @@ namespace SolarManagement.Controllers
                                   select new BatteryVoltages
                                   {
                                       voltage = battery.volt,
+                                      temperature = battery.temp,
                                       TimeData = battery.dttmcreated.Value.ToString("HH:mm"),
                                       DateData = battery.dttmcreated.Value.ToString("MMM-dd-yyyy"),
                                   };
 
             return await batteryVoltages.FirstOrDefaultAsync();
         }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

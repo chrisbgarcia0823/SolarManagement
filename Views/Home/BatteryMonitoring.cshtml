@@ -10,10 +10,6 @@
     <link href="~/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
     <link href="~/plugins/toastr/toastr.min.css" rel="stylesheet" />
 
-    @*FOR DATATABLE*@
-    <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="~/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="~/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 }
 
 <div class="card card-primary">
@@ -269,34 +265,29 @@
 
             //FOR CLICK AND OPEN MODAL ---------------------------------------------------------------------------------------------------------------
             //for modal
-            const modalContent = document.getElementById('modal-content');
-            const barModal = new bootstrap.Modal(document.getElementById('barModal')); // Assuming Bootstrap 5
-            const title = document.getElementById('Title');
 
-            let previouslyClickedIndex = -1;
 
-            // Event listener for chart click events
+            // Event listener for chart click events for voltage
             barChartCanvas_Voltage.canvas.addEventListener('click', async (event) => {
                 const clickedElements = myChart_Voltage.getElementsAtEvent(event);
-
                 if (clickedElements.length > 0) {
                     const element = clickedElements[0]; // Get the first clicked element
                     const labelIndex = element._index; // Index of the clicked bar
-                    if (labelIndex !== previouslyClickedIndex) {
-                        const batteryNum = batterNumber[labelIndex];
-                        const voltage = batteryVoltages[labelIndex];
+                    const batteryNum = batterNumber[labelIndex];
 
-                        // Update modal content
-                        modalContent.textContent = `You clicked on "${batteryNum}" with a value of ${voltage}`;
-                        title.textContent = `Batter ${batteryNum} Live Voltage Data`;
-                        await GetLiveVoltageData(batteryNum);
+                    window.location.href = `@Url.Action("LiveData")/${batteryNum}/Voltage`;
+                }
+            });
 
-                        previouslyClickedIndex = labelIndex; // Update the previously clicked index
-                        console.log(`previouslyClickedIndex = ${labelIndex}`);
-                    }
+            // Event listener for chart click events for temperature
+            barChartCanvas_Temperature.canvas.addEventListener('click', async (event) => {
+                const clickedElements = myChart_Temperature.getElementsAtEvent(event);
+                if (clickedElements.length > 0) {
+                    const element = clickedElements[0]; // Get the first clicked element
+                    const labelIndex = element._index; // Index of the clicked bar
+                    const batteryNum = batterNumber[labelIndex];
 
-                    // Show the modal (assuming Bootstrap 5)
-                    barModal.show();
+                    window.location.href = `@Url.Action("LiveData")/${batteryNum}/Temperature`;
                 }
             });
 
@@ -305,123 +296,6 @@
         });
     </script>
 
-    @*FETCHING THE DATA OF THE BATTERY VOLTAGE (FOR DISPLAYING THE LIVE DATA WHEN BAR IS CLICKED IN THE CHART)*@
-    <script>
-        async function GetLiveVoltageData(batteryNumber) {
-            //FOR ALERT
-            var Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 2000
-            });
-
-            //FOR BATTERY VOLATAGES AND CURRENT MONITORING ---------------------------------------------------------------------------------
-            let batteryVoltage = [];
-            let timeData = [];
-            let updateTime = 1 * 1000; //1seconds
-
-
-            const apiUrl = `@Url.Action("GetBatteryData", "Home")/${batteryNumber}`;
-            const Data = await fetch(apiUrl);
-            if (Data.status === 200) //status success
-            {
-                const result = await Data.json();
-                //iterate to get the result
-                for (i = 0; i < result.length; i++) {
-                    batteryVoltage.push(result[i].voltage);
-                    timeData.push(result[i].timeData.toString());
-                };
-            }
-            else {
-                toastr.error("Fetch data error");
-            }
-
-
-            //-------------
-            //- LINE CHART - VOLTAGES DATA
-            //-------------
-
-
-            // Get context with jQuery - using jQuery's .get() method.
-            var lineChartCanvas = $('#LiveData-Voltages').get(0).getContext('2d'); //this will be my chart
-
-            const ChartData = {
-                labels: timeData,
-                datasets: [{
-                    label: 'Live Battery Voltage Data',
-                    data: batteryVoltage,
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1
-                }]
-            };
-
-            var ChartOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                datasetFill: false,
-                legend: {
-                    display: true
-                },
-                scales: {
-                    xAxes: [{
-                        gridLines: {
-                            display: true,
-                        },
-                        max: 60,
-                    }],
-                    yAxes: [{
-                        gridLines: {
-                            display: true,
-                        }
-                    }]
-                },
-                fill: false
-            }
-
-            const myChart = new Chart(lineChartCanvas,
-                {
-                    type: 'line',
-                    data: ChartData,
-                    options: ChartOptions
-                })
-
-
-            //FOR UPDATING THE CHART --------------------------------------------------------------------------------------------------
-            //async function getNewData() {
-            //    //URL ACTION OF THE METHOD TO ACCESS
-            //    const apiUrl2 = `@Url.Action("LoadNewBatteryData", "Home")/${batteryNumber}/update`;
-            //    // Get the information of the selected item from the controller
-            //    const Data2 = await fetch(apiUrl2);
-            //    if (Data2.status === 200) //status success
-            //    {
-            //        const result2 = await Data2.json();
-            //        if (timeData.at(-1) != result2.timeData) {
-            //            batteryVoltage.shift(); //remove the first element of the voltage data
-            //            timeData.shift(); //remove the first element of the time data
-
-            //            //insert the fetch data to the last element
-            //            batteryVoltage.push(result2.voltage);
-            //            timeData.push(result2.timeData)
-            //        }
-
-            //    }
-            //    else {
-            //        toastr.error("Fetch data error");
-            //    }
-            //}
-
-            // get new data every updateTime(as set above) and update chart
-            //setInterval(async function () {
-            //    getNewData();
-            //    myChart.update();
-            //    console.log(`New data is fetched for battery number ${batteryNumber}`);
-            //}, updateTime);
-
-            //END UPDATING THE CHART --------------------------------------------------------------------------------------------------
-        };
-
-    </script>
 
     @*FOR ALERTS*@
     <script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>

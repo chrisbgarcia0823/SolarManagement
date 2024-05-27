@@ -9,20 +9,17 @@
     <link href="~/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
     <link href="~/plugins/toastr/toastr.min.css" rel="stylesheet" />
 
-    @*FOR DATATABLE*@
-    <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="~/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="~/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 }
 
 
 <div class="card card-outline card-primary">
     <div class="card-header">
-        <h3 class="card-title"><i class="far fa-chart-bar"></i>Battery 1</h3>
-        <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                <i class="fas fa-minus"></i>
-            </button>
+        <h3 class="card-title" id="Card-Title"><i class="far fa-chart-bar"></i> Live Data Of Battery @TempData["BatteryNumber"] @TempData["Parameter"]</h3>
+    </div>
+    <div class="card-body">
+        <div class="row" id="LiveData_Div">
+            @*LIVE DATA FROM FETCH API WILL GO HERE*@
+            <canvas id="LiveData-Voltages" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
         </div>
     </div>
 </div>
@@ -30,46 +27,263 @@
 
 @section Scripts
 {
-    <script>
-        $(async function () {
-            //useful link - https://stackoverflow.com/questions/74280609/how-to-make-chart-js-display-values-in-real-time
-            //Variables
-            let date = [];
-            let power = [];
-            let voltage = [];
-            let current = [];
-            let updateTime = 30 * 1000; //1seconds
-            let currentDate = '';
+    @*FOR BATTERY VOLTAGE*@
+    @if (TempData["Parameter"].ToString().ToLower() == "voltage")
+    {
+        @*FETCHING THE DATA OF THE BATTERY VOLTAGE*@
+        <script>
+            $(async function () {
+
+                let batteryNumber = @TempData["BatteryNumber"];
+
+                //FOR ALERT
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+
+                //FOR BATTERY VOLATAGES DATA ---------------------------------------------------------------------------------
+                let batteryVoltage = [];
+                let timeData = [];
+                let updateTime = 1 * 1000; //1seconds
 
 
-            //FOR ALERT
-            var Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 2000
-            });
+                const apiUrl = `@Url.Action("GetBatteryData", "Home")/${batteryNumber}`;
+                const Data = await fetch(apiUrl);
+                if (Data.status === 200) //status success
+                {
+                    const result = await Data.json();
+                    //iterate to get the result
+                    for (i = 0; i < result.length; i++) {
+                        batteryVoltage.push(result[i].voltage);
+                        timeData.push(result[i].timeData.toString());
+                    };
+                }
+                else {
+                    toastr.error("Fetch data error");
+                }
 
-            //URL ACTION OF THE METHOD TO ACCESS
-            const apiUrl = `@Url.Action("LoadPowerData", "Home")/2`;
-            // Get the information of the selected item from the controller
-            const Data = await fetch(apiUrl);
-            if (Data.status === 200) //status success
-            {
-                const jsonData = await Data.json();
-                currentDate = jsonData[59].dataDate;
-                //console.log(jsonData);
-                //get the labels (equivalent to the item number)
-                for (i = 0; i < jsonData.length; i++) {
-                    date.push(jsonData[i].timeData.toString()); //adding new data to array
-                    power.push(jsonData[i].power); //adding new data to array
-                    voltage.push(jsonData[i].volt);
-                    current.push(jsonData[i].ampere);
+                //-------------
+                //- LINE CHART - VOLTAGES DATA
+                //-------------
+
+
+                // Get context with jQuery - using jQuery's .get() method.
+                var lineChartCanvas = $('#LiveData-Voltages').get(0).getContext('2d'); //this will be my chart
+
+                const ChartData = {
+                    labels: timeData,
+                    datasets: [{
+                        label: 'Live Battery Voltage Data',
+                        data: batteryVoltage,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
                 };
-            }
-            else {
-                toastr.error("Error Loading Esp1 data error");
-            }
-         )}
-    </script>
+
+                var ChartOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    datasetFill: false,
+                    legend: {
+                        display: true
+                    },
+                    scales: {
+                        xAxes: [{
+                            gridLines: {
+                                display: true,
+                            },
+                            max: 60,
+                        }],
+                        yAxes: [{
+                            gridLines: {
+                                display: true,
+                            }
+                        }]
+                    },
+                    fill: false
+                }
+
+                const myChart = new Chart(lineChartCanvas,
+                    {
+                        type: 'line',
+                        data: ChartData,
+                        options: ChartOptions
+                    });
+
+                //FOR UPDATING THE CHART --------------------------------------------------------------------------------------------------
+                async function getNewData() {
+                    //URL ACTION OF THE METHOD TO ACCESS
+                    const apiUrl2 = `@Url.Action("LoadNewBatteryData", "Home")/${batteryNumber}/update`;
+                    // Get the information of the selected item from the controller
+                    const Data2 = await fetch(apiUrl2);
+                    if (Data2.status === 200) //status success
+                    {
+                        const result2 = await Data2.json();
+                        if (timeData.at(-1) != result2.timeData) {
+                            batteryVoltage.shift(); //remove the first element of the voltage data
+                            timeData.shift(); //remove the first element of the time data
+
+                            //insert the fetch data to the last element
+                            batteryVoltage.push(result2.voltage);
+                            timeData.push(result2.timeData)
+                        }
+
+                    }
+                    else {
+                        toastr.error("Fetch data error");
+                    }
+                }
+
+                // get new data every updateTime(as set above) and update chart
+                setInterval(async function () {
+                    getNewData();
+                    myChart.update();
+                    console.log(`New data is fetched for battery number ${batteryNumber}`);
+                }, updateTime);
+
+                //END UPDATING THE CHART --------------------------------------------------------------------------------------------------
+            });
+        </script>
+    }
+
+    @*FOR BATTERY TEMPERATURE*@
+    else if (TempData["Parameter"].ToString().ToLower() == "temperature")
+    {
+        @*FETCHING THE DATA OF THE BATTERY VOLTAGE*@
+        <script>
+            $(async function () {
+
+                let batteryNumber = @TempData["BatteryNumber"];
+
+                //FOR ALERT
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+
+                //FOR BATTERY VOLATAGES DATA ---------------------------------------------------------------------------------
+                let batteryTemperature = [];
+                let timeData = [];
+                let updateTime = 1 * 1000; //1seconds
+
+
+                const apiUrl = `@Url.Action("GetBatteryData", "Home")/${batteryNumber}`;
+                const Data = await fetch(apiUrl);
+                if (Data.status === 200) //status success
+                {
+                    const result = await Data.json();
+                    //iterate to get the result
+                    for (i = 0; i < result.length; i++) {
+                        batteryTemperature.push(result[i].temperature);
+                        timeData.push(result[i].timeData.toString());
+                    };
+                }
+                else {
+                    toastr.error("Fetch data error");
+                }
+
+                //-------------
+                //- LINE CHART - VOLTAGES DATA
+                //-------------
+
+
+                // Get context with jQuery - using jQuery's .get() method.
+                var lineChartCanvas = $('#LiveData-Voltages').get(0).getContext('2d'); //this will be my chart
+
+                const ChartData = {
+                    labels: timeData,
+                    datasets: [{
+                        label: 'Live Battery Temperature Data',
+                        data: batteryTemperature,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                };
+
+                var ChartOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    datasetFill: false,
+                    legend: {
+                        display: true
+                    },
+                    scales: {
+                        xAxes: [{
+                            gridLines: {
+                                display: true,
+                            },
+                            max: 60,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Battery Number',
+                            }
+                        }],
+                        yAxes: [{
+                            gridLines: {
+                                display: true,
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Celcius',
+                            }
+                        }]
+                    },
+                    fill: false
+                }
+
+                const myChart = new Chart(lineChartCanvas,
+                    {
+                        type: 'line',
+                        data: ChartData,
+                        options: ChartOptions
+                    });
+
+                //FOR UPDATING THE CHART --------------------------------------------------------------------------------------------------
+                async function getNewData() {
+                    //URL ACTION OF THE METHOD TO ACCESS
+                    const apiUrl2 = `@Url.Action("LoadNewBatteryData", "Home")/${batteryNumber}/update`;
+                    // Get the information of the selected item from the controller
+                    const Data2 = await fetch(apiUrl2);
+                    if (Data2.status === 200) //status success
+                    {
+                        const result2 = await Data2.json();
+                        if (timeData.at(-1) != result2.timeData) {
+                            batteryTemperature.shift(); //remove the first element of the voltage data
+                            timeData.shift(); //remove the first element of the time data
+
+                            //insert the fetch data to the last element
+                            batteryTemperature.push(result2.temperature);
+                            timeData.push(result2.timeData)
+                        }
+
+                    }
+                    else {
+                        toastr.error("Fetch data error");
+                    }
+                }
+
+                // get new data every updateTime(as set above) and update chart
+                setInterval(async function () {
+                    getNewData();
+                    myChart.update();
+                    console.log(`New data is fetched for battery number ${batteryNumber}`);
+                }, updateTime);
+
+                //END UPDATING THE CHART --------------------------------------------------------------------------------------------------
+            });
+        </script>
+    }
+
+
+    @*FOR ALERTS*@
+    <script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <script src="~/plugins/toastr/toastr.min.js"></script>
+
+    @*FOR CHART JS*@
+    <script src="~/plugins/chart.js/Chart.min.js"></script>
 }
