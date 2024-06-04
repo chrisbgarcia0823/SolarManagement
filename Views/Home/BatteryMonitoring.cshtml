@@ -1,6 +1,7 @@
 ﻿﻿@{
     ViewData["Title"] = "Battery Monitoring";
     Layout = "~/Views/Shared/AdminLTE/_Layout.cshtml";
+    ViewData["ContentHeader"] = "Battery Monitoring";
 }
 
 @section Styles
@@ -44,31 +45,6 @@
     </div>
 </div>
 
-
-@*MODAL FOR LIVE VIEW*@
-<div class="modal" id="barModal">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="Title"></h5>
-                <button type="button" class="close" data-dismiss="modal" id="ModalCloseBtn">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p id="modal-content"></p>
-                <div class="row" id="LiveData_Div">
-                    @*LIVE DATA FROM FETCH API WILL GO HERE*@
-                    <canvas id="LiveData-Voltages" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-
-                </div>
-            </div>
-            <div class="modal-footer">
-                <div class="row">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="ModalCloseBtn">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 @section Scripts
 {

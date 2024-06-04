@@ -37,7 +37,7 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <li class="nav-item">
                     <a href="#" class="nav-link @Url.MakeActiveClass("Home")">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <i class="nav-icon fas fa-battery-full"></i>
                         <p>
                             Battery Monitoring
                             <i class="right fas fa-angle-left"></i>
@@ -46,7 +46,7 @@
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="@Url.Action("BatteryMonitoring", "Home")" class="nav-link @Url.MakeActiveClass("Home", "BatteryMonitoring")">
-                                <i class="nav-icon fas fa-chart-line"></i>
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>
                                     Voltage and Temperature
                                 </p>
@@ -54,9 +54,52 @@
                         </li>
                         <li class="nav-item">
                             <a href="@Url.Action("TableView", "Home")" class="nav-link @Url.MakeActiveClass("Home", "TableView")">
-                                <i class="nav-icon fas fa-chart-line"></i>
+                                <i class="nav-icon fas fa-table"></i>
                                 <p>
                                     Table View
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link @Url.MakeActiveClass("LoadMonitoring")">
+                        <i class="nav-icon fas fa-plug"></i>
+                        <p>
+                            Load Monitoring
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="@Url.Action("Summary", "LoadMonitoring")" class="nav-link @Url.MakeActiveClass("LoadMonitoring", "Summary")">
+                                <i class="nav-icon fas fa-list"></i>
+                                <p>
+                                    Summary
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("CriticalLoad", "LoadMonitoring")" class="nav-link @Url.MakeActiveClass("LoadMonitoring", "CriticalLoad")">
+                                <i class="nav-icon fas fa-bolt"></i>
+                                <p>
+                                    Critical Load
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("MediumLoad", "LoadMonitoring")" class="nav-link @Url.MakeActiveClass("LoadMonitoring", "MediumLoad")">
+                                <i class="nav-icon fas fa-bolt"></i>
+                                <p>
+                                    Medium Load
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("NormalLoad", "LoadMonitoring")" class="nav-link @Url.MakeActiveClass("LoadMonitoring", "NormalLoad")">
+                                <i class="nav-icon fas fa-bolt"></i>
+                                <p>
+                                    Normal Load
                                 </p>
                             </a>
                         </li>

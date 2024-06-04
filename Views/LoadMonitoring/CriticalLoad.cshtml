@@ -1,0 +1,42 @@
+﻿﻿@{
+    ViewData["Title"] = "Critical Load Monitoring";
+    ViewData["ContentHeader"] = "Critical Load Monitoring";
+    Layout = "~/Views/Shared/AdminLTE/_Layout.cshtml";
+}
+
+@section Styles
+{
+    @*FOR ALERTS*@
+    <link href="~/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/plugins/toastr/toastr.min.css" rel="stylesheet" />
+}
+
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title"><i class="far fa-chart-bar"></i>Battery Voltage Monitoring</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="chart" id="VoltageDiv">
+            <canvas id="BarChart-Power" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+    {
+    @*FOR ALERTS*@
+    <script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <script src="~/plugins/toastr/toastr.min.js"></script>
+
+    @*FOR CHART JS*@
+    <script src="~/plugins/chart.js/Chart.min.js"></script>
+
+
+}

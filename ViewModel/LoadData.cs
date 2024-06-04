@@ -10,13 +10,13 @@ namespace SolarManagement.ViewModel
         [Key]
         public int id { get; set; }
 
-        [Column(TypeName = "decimal(18,4)")]
+        [Column(TypeName = "decimal(18,3)")]
         public decimal? volt { get; set; }
 
-        [Column(TypeName = "decimal(18,4)")]
+        [Column(TypeName = "decimal(18,3)")]
         public decimal? Ampere { get; set; }
 
-        [Column(TypeName = "decimal(18,4)")]
+        [Column(TypeName = "decimal(18,3)")]
         public decimal? power { get; set; }
 
         public string? EspNum { get; set; }
@@ -25,10 +25,6 @@ namespace SolarManagement.ViewModel
 
         public string? DateData { get; set; }
 
-        public decimal? energy { get; set; }
 
-        public decimal? freq { get; set; }
-
-        public decimal? pf { get; set; }
     }
 }

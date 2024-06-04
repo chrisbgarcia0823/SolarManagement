@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SolarManagement.Data;
 using SolarManagement.Models;
+using SolarManagement.ViewModel;
 
 namespace SolarManagement.Controllers
 {
@@ -28,6 +29,10 @@ namespace SolarManagement.Controllers
             {
                 return NotFound();
             }
+
+            var powerQuery = from power in _context.powertbl select power;
+
+
             return await _context.powertbl.ToListAsync();
         }
 
@@ -52,6 +57,24 @@ namespace SolarManagement.Controllers
             return power;
         }
 
+        [Route("[controller]/[action]")]
+        public async Task<ActionResult<List<LoadData>>> GetLoadData()
+        {
+            string sqlQuery = "SELECT * FROM [db3861].[dbo].[vPower]";
+            var data = _context.powertbl.FromSqlRaw(sqlQuery);
+            var loadData = from power in data
+                                  select new LoadData
+                                  {
+                                      id = power.id,
+                                      volt = power.volt,
+                                      Ampere = power.Ampere,
+                                      EspNum = power.EspNum,
+                                      TimeData = power.datetimecreated.Value.ToString("HH:mm"),
+                                      DateData = power.datetimecreated.Value.ToString("MMM-dd-yyyy"),
+                                  };
+
+            return await loadData.ToListAsync();
+        }
 
 
         [Route("[controller]/[action]/{volt}/{current}/{power}/{espNum}/{energy}/{freq}/{pf}")]

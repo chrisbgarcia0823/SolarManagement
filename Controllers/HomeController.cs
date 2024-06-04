@@ -16,10 +16,6 @@ namespace SolarManagement.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
 
         public IActionResult BatteryMonitoring()
         {
@@ -41,20 +37,6 @@ namespace SolarManagement.Controllers
             return View();
         }
 
-        public IActionResult OutputEsp1()
-        {
-            return View();
-        }
-
-        public IActionResult OutputEsp2()
-        {
-            return View();
-        }
-
-        public IActionResult OutputEsp3()
-        {
-            return View();
-        }
 
         [HttpGet]
         [Route("[controller]/[action]/{espNum}")]
