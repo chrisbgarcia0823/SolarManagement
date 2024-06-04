@@ -5,12 +5,12 @@ using SolarManagement.Models;
 
 namespace SolarManagement.Controllers
 {
-    public class currentController : Controller
+    public class currenttblController : Controller
     {
 
         private SolarManagementContext _context;
 
-        public currentController(SolarManagementContext context)
+        public currenttblController(SolarManagementContext context)
         {
             _context = context;
         }

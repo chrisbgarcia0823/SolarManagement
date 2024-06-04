@@ -21,9 +21,34 @@ namespace SolarManagement.ViewModel
 
         public string? EspNum { get; set; }
 
+        public string? Category
+        {
+            get
+            {
+                if(EspNum == "1")
+                {
+                    return "Critical Load";
+                }
+                else if(EspNum == "2")
+                {
+                    return "Normal Load";
+                }
+                else if(EspNum == "3")
+                {
+                    return "Less Priority Load";
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
         public string? TimeData { get; set; }
 
         public string? DateData { get; set; }
+
+        
 
 
     }

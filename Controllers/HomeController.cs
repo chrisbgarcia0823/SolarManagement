@@ -38,49 +38,49 @@ namespace SolarManagement.Controllers
         }
 
 
-        [HttpGet]
-        [Route("[controller]/[action]/{espNum}")]
-        public async Task<ActionResult<IEnumerable<LoadData>>> LoadPowerData(string espNum)
-        {
-            var query = from data in _context.powertbl
-                        where data.EspNum.ToLower() == espNum.ToLower()
-                        select new LoadData
-                        {
-                            TimeData = data.datetimecreated.Value.ToString("HH:mm"),
-                            DateData = data.datetimecreated.Value.ToString("MMM-dd-yyyy"),
-                            Ampere = data.Ampere,
-                            volt = data.volt,
-                            power = data.power,
-                            energy = data.energy,
-                            freq = data.freq,
-                            pf = data.pf,
-                        };
+        //[HttpGet]
+        //[Route("[controller]/[action]/{espNum}")]
+        //public async Task<ActionResult<IEnumerable<LoadData>>> LoadPowerData(string espNum)
+        //{
+        //    var query = from data in _context.powertbl
+        //                where data.EspNum.ToLower() == espNum.ToLower()
+        //                select new LoadData
+        //                {
+        //                    TimeData = data.datetimecreated.Value.ToString("HH:mm"),
+        //                    DateData = data.datetimecreated.Value.ToString("MMM-dd-yyyy"),
+        //                    Ampere = data.Ampere,
+        //                    volt = data.volt,
+        //                    power = data.power,
+        //                    energy = data.energy,
+        //                    freq = data.freq,
+        //                    pf = data.pf,
+        //                };
 
-            return await query.Take(60).ToListAsync();
-        }
+        //    return await query.Take(60).ToListAsync();
+        //}
 
-        //FETCH TO INDIVIDUALLY GET AN UPDATE ON THE DATA
-        [HttpGet]
-        [Route("[controller]/[action]/{espNum}/{update}")]
-        public async Task<ActionResult<LoadData>> LoadNewPowerData(string espNum, string update)
-        {
-            var query = from data in _context.powertbl
-                        where data.EspNum.ToLower() == espNum.ToLower()
-                        orderby data.id descending
-                        select new LoadData
-                        {
-                            TimeData = data.datetimecreated.Value.ToString("HH:mm"),
-                            DateData = data.datetimecreated.Value.ToString("MMM-dd-yyyy"),
-                            Ampere = data.Ampere,
-                            volt = data.volt,
-                            power = data.power,
-                            energy = data.energy,
-                            freq = data.freq,
-                            pf = data.pf,
-                        };
+        ////FETCH TO INDIVIDUALLY GET AN UPDATE ON THE DATA
+        //[HttpGet]
+        //[Route("[controller]/[action]/{espNum}/{update}")]
+        //public async Task<ActionResult<LoadData>> LoadNewPowerData(string espNum, string update)
+        //{
+        //    var query = from data in _context.powertbl
+        //                where data.EspNum.ToLower() == espNum.ToLower()
+        //                orderby data.id descending
+        //                select new LoadData
+        //                {
+        //                    TimeData = data.datetimecreated.Value.ToString("HH:mm"),
+        //                    DateData = data.datetimecreated.Value.ToString("MMM-dd-yyyy"),
+        //                    Ampere = data.Ampere,
+        //                    volt = data.volt,
+        //                    power = data.power,
+        //                    energy = data.energy,
+        //                    freq = data.freq,
+        //                    pf = data.pf,
+        //                };
 
-            return await query.FirstOrDefaultAsync();
-        }
+        //    return await query.FirstOrDefaultAsync();
+        //}
 
         [Route("[controller]/[action]")]
         public async Task<ActionResult<List<BatteryVoltages>>> GetBatteryData()

@@ -67,6 +67,7 @@ namespace SolarManagement.Controllers
                                   {
                                       id = power.id,
                                       volt = power.volt,
+                                      power = power.power,
                                       Ampere = power.Ampere,
                                       EspNum = power.EspNum,
                                       TimeData = power.datetimecreated.Value.ToString("HH:mm"),
