@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SolarManagement.Data;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SolarManagementContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("TestServer") ?? throw new InvalidOperationException("Connection string 'SolarManagementContext' not found.")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LiveServer") ?? throw new InvalidOperationException("Connection string 'SolarManagementContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
