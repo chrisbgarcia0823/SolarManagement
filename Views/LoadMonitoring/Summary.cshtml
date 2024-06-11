@@ -28,7 +28,7 @@
     </div>
 </div>
 
-@*FOR THE OUTPUT LOAD CURRENT*@
+@*FOR THE OUTPUT LOAD VOLTAGE*@
 <div class="card card-primary">
     <div class="card-header">
         <h3 class="card-title"><i class="far fa-chart-bar"></i> Output Voltage Monitoring</h3>
@@ -45,6 +45,22 @@
     </div>
 </div>
 
+@*FOR THE OUTPUT LOAD CURRENT*@
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title"><i class="far fa-chart-bar"></i> Output Voltage Monitoring</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="chart" id="CurrentDiv">
+            <canvas id="BarChart-Current" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+        </div>
+    </div>
+</div>
 
 @section Scripts
 {
@@ -155,7 +171,7 @@
 
 
             //-------------
-            //- BAR CHART - AMPERE DATA -------------------------------------------------------------------------
+            //- BAR CHART - VOLTAGE DATA -------------------------------------------------------------------------
             //-------------
             
             // Get context with jQuery - using jQuery's .get() method.
@@ -208,6 +224,59 @@
                 })
 
 
+            //-------------
+            //- BAR CHART - AMPERE DATA -------------------------------------------------------------------------
+            //-------------
+
+            // Get context with jQuery - using jQuery's .get() method.
+            var barChartCanvas_Ampere = $('#BarChart-Ampere').get(0).getContext('2d'); //this will be my chart
+
+            const ChartData_Ampere = {
+                labels: espNumber,
+                datasets: [{
+                    label: 'Load Current',
+                    data: loadAmpere,
+                    backgroundColor: 'rgba(51, 51, 225, 0.5)',
+                }]
+            };
+
+            var ChartOptions_Ampere = {
+                responsive: true,
+                maintainAspectRatio: false,
+                datasetFill: false,
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 3
+                        },
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'ESP Number',
+                        },
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        },
+                        display: true,
+                        scaleLabel:
+                        {
+                            display: true,
+                            labelString: 'Ampere',
+                        },
+                    }]
+                },
+            }
+
+            const myChart_Ampere = new Chart(barChartCanvas_Ampere,
+                {
+                    type: 'bar',
+                    data: ChartData_Ampere,
+                    options: ChartOptions_Ampere
+                })
+
             //GET NEW DATA ---------------------------------------------------------------------------------------
 
             async function getNewData() {
@@ -250,10 +319,12 @@
                 //update the chart data
                 myChart_Power.data.datasets[0].data = loadPower;
                 myChart_Voltage.data.datasets[0].data = loadVolt;
+                myChart_Ampere.data.datasets[0].data = loadAmpere;
 
                 //update the chart
                 myChart_Power.update();
                 myChart_Voltage.update()
+                myChart_Ampere.update()
 
                 //myChart_Temperature.update();
                 console.log('Power Bar Chart Data Updated');
