@@ -57,6 +57,7 @@ namespace SolarManagement.Controllers
             return power;
         }
 
+        //TO GET THE LOAD DATA
         [Route("[controller]/[action]")]
         public async Task<ActionResult<List<LoadData>>> GetLoadData()
         {
@@ -77,7 +78,7 @@ namespace SolarManagement.Controllers
             return await loadData.ToListAsync();
         }
 
-
+        //FOR INSERT DATA TO POWERTBL 
         [Route("[controller]/[action]/{volt}/{current}/{power}/{espNum}/{energy}/{freq}/{pf}")]
         public async Task<ActionResult<powertbl>> InsertData(decimal volt, decimal current, decimal power, string espNum, decimal energy, decimal freq, decimal pf)
         {
@@ -99,7 +100,29 @@ namespace SolarManagement.Controllers
             return CreatedAtAction("Getpower", new { id = newPOwer.id }, newPOwer);
         }
 
-      
+        //FOR INSERT DATA TO POWERTBL2
+        [Route("[controller]/[action]/{volt}/{current}/{power}/{espNum}/{energy}/{freq}/{pf}")]
+        public async Task<ActionResult<powertbl2>> InsertData2(decimal volt, decimal current, decimal power, string espNum, decimal energy, decimal freq, decimal pf)
+        {
+            powertbl2 newPOwer = new powertbl2
+            {
+                volt = volt,
+                Ampere = current,
+                power = power,
+                EspNum = espNum,
+                energy = energy,
+                freq = freq,
+                pf = pf,
+                datetimecreated = ToUTC8(),
+            };
+
+            _context.powertbl2.Add(newPOwer);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("Getpower", new { id = newPOwer.id }, newPOwer);
+        }
+
+
 
         public static DateTime ToUTC8()
         {

@@ -15,6 +15,7 @@ namespace SolarManagement.Data
         }
 
         public DbSet<SolarManagement.Models.powertbl> powertbl { get; set; } = default!;
+        public DbSet<SolarManagement.Models.powertbl2> powertbl2 { get; set; } = default!;
         public DbSet<SolarManagement.Models.loadtbl> loadtbl { get; set; } = default!;
         public DbSet<SolarManagement.Models.batterytbl> batterytbl { get; set; } = default!;
 
