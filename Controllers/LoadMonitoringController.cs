@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SolarManagement.Data;
+using SolarManagement.ViewModel;
+using System;
 
 namespace SolarManagement.Controllers
 {
@@ -27,9 +29,14 @@ namespace SolarManagement.Controllers
             return View(queryList);
         }
 
-        public IActionResult CriticalLoad()
+        public async Task<IActionResult> CriticalLoad()
         {
-            return View();
+
+            var query = from p in _context.powertbl where p.EspNum.ToLower() == "1" select p;
+
+            var queryList = await query.ToListAsync();
+
+            return View(queryList);
         }
 
         public IActionResult MediumLoad()
@@ -41,5 +48,85 @@ namespace SolarManagement.Controllers
         {
             return View();
         }
+
+        [Route("[controller]/[action]/{espNum}")]
+        public async Task<ActionResult<List<LoadData>>> GetLoadData(string espNum)
+        {
+            string category = "";
+            if (espNum == "1")
+            {
+                category = "Critical Load";
+            }
+            else if (espNum == "2")
+            {
+                category = "Normal Load";
+            }
+            else if (espNum == "3")
+            {
+                category = "Less Priority Load";
+            }
+            else
+            {
+                category = "";
+            }
+
+            var loadData = from load in _context.powertbl
+                                  where load.EspNum.ToLower() == espNum.ToLower()
+                                  orderby load.id descending
+                                  select new LoadData
+                                  {
+                                      id = load.id,
+                                      volt = load.volt,
+                                      Ampere = load.Ampere,
+                                      power = load.power,
+                                      TimeData = load.datetimecreated.Value.ToString("HH:mm"),
+                                      DateData = load.datetimecreated.Value.ToString("MMM-dd-yyyy"),
+                                      EspNum = espNum,
+                                      Category = category,
+                                  };
+
+            return await loadData.Take(60).OrderBy(data => data.id).ToListAsync();
+        }
+
+        //FETCH TO INDIVIDUALLY GET AN UPDATE ON THE DATA
+        [Route("[controller]/[action]/{espNum}/{update}")]
+        public async Task<ActionResult<LoadData>> UpdateLoadData(string espNum, string update)
+        {
+            string category = "";
+            if (espNum == "1")
+            {
+                category = "Critical Load";
+            }
+            else if (espNum == "2")
+            {
+                category = "Normal Load";
+            }
+            else if (espNum == "3")
+            {
+                category = "Less Priority Load";
+            }
+            else
+            {
+                category = "";
+            }
+
+            var loadData = from load in _context.powertbl
+                                  where load.EspNum.ToLower() == espNum.ToLower()
+                                  orderby load.id descending
+                                  select new LoadData
+                                  {
+                                      id = load.id,
+                                      volt = load.volt,
+                                      Ampere = load.Ampere,
+                                      power = load.power,
+                                      TimeData = load.datetimecreated.Value.ToString("HH:mm"),
+                                      DateData = load.datetimecreated.Value.ToString("MMM-dd-yyyy"),
+                                      EspNum = espNum,
+                                      Category = category,
+                                  };
+
+            return await loadData.FirstOrDefaultAsync();
+        }
+
     }
 }
