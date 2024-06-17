@@ -1,5 +1,8 @@
-﻿﻿@{
+﻿@model IEnumerable<SolarManagement.Models.powertbl>
+
+﻿@{
     ViewData["Title"] = "Medium Load Monitoring";
+    ViewData["ContentHeader"] = "Medium Load Monitoring";
     Layout = "~/Views/Shared/AdminLTE/_Layout.cshtml";
 }
 
@@ -10,7 +13,61 @@
     <link href="~/plugins/toastr/toastr.min.css" rel="stylesheet" />
 }
 
-<h1>Medium Load</h1>
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title"><i class="far fa-chart-bar"></i>Medium Load Power Live Data</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="chart" id="VoltageDiv">
+            <canvas id="LiveData-Power" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <h3>Medium Load Data</h3>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="MediumLoad-table" class="table table-bordered table-striped dataTable dtr-inline" aria-describedby="example1_info">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Voltage(Volts)</th>
+                                    <th>Current(Amperes)</th>
+                                    <th>Power (Watts) #</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var data in Model)
+                                {
+                                    <tr>
+                                        <td>@data.id</td>
+                                        <td>@data.volt</td>
+                                        <td>@data.Ampere</td>
+                                        <td>@data.power</td>
+                                        <td>@data.datetimecreated?.ToString("dd-MMM-yyyy HH:mm:ss")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts
     {
@@ -21,5 +78,159 @@
     @*FOR CHART JS*@
     <script src="~/plugins/chart.js/Chart.min.js"></script>
 
+    @*FOR DATATABLE*@
+    <script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/plugins/jszip/jszip.min.js"></script>
+    <script src="~/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="~/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="~/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
+    <script>
+        $(function () {
+            $("#MediumLoad-table").DataTable({
+                "order": [[0, 'desc']],
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "paging": false,
+                "info": true,
+                "paging": true,
+                "buttons": ["csv", "excel", "pdf", "colvis"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        });
+    </script>
+
+    @*FOR OUTPUT POWER*@
+    @*FETCHING THE DATA OF THE OUTPUT POWER*@
+    <script>
+        $(async function () {
+
+            //FOR ALERT
+            var Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+
+            //FOR BATTERY VOLATAGES DATA ---------------------------------------------------------------------------------
+            let id = [];
+            let loadPower = [];
+            let loadVolt = [];
+            let loadAmpere = []
+            let timeData = [];
+            let dateData = [];
+            let Category = [];
+            let updateTime = 60 * 1000; //1seconds
+
+            const apiUrl = `@Url.Action("GetLoadData", "LoadMonitoring")/2`;
+            const Data = await fetch(apiUrl);
+            if (Data.status === 200) //status success
+            {
+                const result = await Data.json();
+                //iterate to get the result
+                for (i = 0; i < result.length; i++) {
+                    loadPower.push(result[i].power);
+                    loadVolt.push(result[i].volt);
+                    loadAmpere.push(result[i].ampere);
+                    timeData.push(result[i].timeData.toString());
+                };
+            }
+            else {
+                toastr.error("Fetch data error");
+            }
+
+            //-------------
+            //- LINE CHART - VOLTAGES DATA
+            //-------------
+
+
+            // Get context with jQuery - using jQuery's .get() method.
+            var lineChartCanvas_Power = $('#LiveData-Power').get(0).getContext('2d'); //this will be my chart
+
+            const ChartData_Power = {
+                labels: timeData,
+                datasets: [{
+                    label: 'Live Load Power Data',
+                    data: loadPower,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            };
+
+            var ChartOptions_Power = {
+                responsive: true,
+                maintainAspectRatio: false,
+                datasetFill: false,
+                legend: {
+                    display: true
+                },
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            display: true,
+                        },
+                        max: 60,
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            display: true,
+                        }
+                    }]
+                },
+                fill: false
+            }
+
+            const myChart_Power = new Chart(lineChartCanvas_Power,
+                {
+                    type: 'line',
+                    data: ChartData_Power,
+                    options: ChartOptions_Power
+                });
+
+            //FOR UPDATING THE CHART --------------------------------------------------------------------------------------------------
+            async function getNewData() {
+                //URL ACTION OF THE METHOD TO ACCESS
+                const apiUrl2 = `@Url.Action("UpdateLoadData", "LoadMonitoring")/2/update`;
+                // Get the information of the selected item from the controller
+                const Data2 = await fetch(apiUrl2);
+                if (Data2.status === 200) //status success
+                {
+                    const result2 = await Data2.json();
+                    if (timeData.at(-1) != result2.timeData) {
+                        loadPower.shift(); //remove the first element of the power data
+                        loadVolt.shift(); //remove the first element of the volt data
+                        loadAmpere.shift() //remove the first element of the ampere data
+                        timeData.shift(); //remove the first element of the time data
+
+                        //insert the fetch data to the last element
+                        loadPower.push(result[i].power);
+                        loadVolt.push(result[i].volt);
+                        loadAmpere.push(result[i].ampere);
+                        timeData.push(result[i].timeData.toString());
+                    }
+
+                }
+                else {
+                    toastr.error("Fetch data error");
+                }
+            }
+
+            // get new data every updateTime(as set above) and update chart
+            setInterval(async function () {
+                getNewData();
+                myChart_Power.update();
+                console.log(`New data is fetched for critical load}`);
+            }, updateTime);
+
+            //END UPDATING THE CHART --------------------------------------------------------------------------------------------------
+        });
+    </script>
 }

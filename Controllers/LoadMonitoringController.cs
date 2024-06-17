@@ -39,14 +39,22 @@ namespace SolarManagement.Controllers
             return View(queryList);
         }
 
-        public IActionResult MediumLoad()
+        public async Task<IActionResult> MediumLoad()
         {
-            return View();
+            var query = from p in _context.powertbl where p.EspNum.ToLower() == "2" select p;
+
+            var queryList = await query.ToListAsync();
+
+            return View(queryList);
         }
 
-        public IActionResult NormalLoad()
+        public async Task<IActionResult> NormalLoad()
         {
-            return View();
+            var query = from p in _context.powertbl where p.EspNum.ToLower() == "3" select p;
+
+            var queryList = await query.ToListAsync();
+
+            return View(queryList);
         }
 
         [Route("[controller]/[action]/{espNum}")]

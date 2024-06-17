@@ -17,6 +17,7 @@
 <div class="card card-primary">
     <div class="card-header">
         <h3 class="card-title"><i class="far fa-chart-bar"></i>Critical Load Power Live Data</h3>
+        <input type="checkbox" name="my-checkbox" checked data-bootstrap-switch data-off-color="danger" data-on-color="success">
         <div class="card-tools">
             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                 <i class="fas fa-minus"></i>
@@ -232,5 +233,13 @@
 
             //END UPDATING THE CHART --------------------------------------------------------------------------------------------------
         });
+    </script>
+
+    @*FOR BOOTSTRAP SWITCH*@
+    <script src="~/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+    <script>
+        $("input[data-bootstrap-switch]").each(function () {
+            $(this).bootstrapSwitch('state', $(this).prop('checked'));
+        })
     </script>
 }
