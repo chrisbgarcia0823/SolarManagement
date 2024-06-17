@@ -245,4 +245,12 @@
             //END UPDATING THE CHART --------------------------------------------------------------------------------------------------
         });
     </script>
+
+    @*FOR BOOTSTRAP SWITCH*@
+    <script src="~/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+    <script>
+        $("input[data-bootstrap-switch]").each(function () {
+            $(this).bootstrapSwitch('state', $(this).prop('checked'));
+        })
+    </script>
 }
