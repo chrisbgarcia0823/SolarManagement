@@ -1,12 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using SolarManagement.BackgroundTask;
 using SolarManagement.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SolarManagementContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("LiveServer") ?? throw new InvalidOperationException("Connection string 'SolarManagementContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+//add this for hosted service
+builder.Services.AddSingleton<IHostedService, TimedHostedService>();
 
 var app = builder.Build();
 
