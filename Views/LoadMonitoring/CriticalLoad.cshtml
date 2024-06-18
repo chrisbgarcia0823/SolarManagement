@@ -19,7 +19,7 @@
                 <h3 class="card-title">Turn Critical Load On/Off</h3>
             </div>
             <div class="card-body">
-                <input type="checkbox" name="my-checkbox" checked data-bootstrap-switch data-off-color="danger" data-on-color="success">
+                <input type="checkbox" name="my-checkbox" onclick="UpdateStatus()" id="my-checkbox" checked data-bootstrap-switch data-off-color="danger" data-on-color="success">
             </div>
         </div>
     </div>
@@ -276,10 +276,60 @@
     <script src="~/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
     @*TURN SWITCH ON OR OFF*@
     <script>
-        async function SwitchLoad(espNum)
+        async function UpdateStatus()
         {
-            //Turn the switch off by setting the state to false
-            $('input[name="my-checkbox"]').bootstrapSwitch('state', false);
+            //FOR ALERT
+            var Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+
+            const isSwitchOn = $("#my-checkbox").prop("checked");
+
+            if (isSwitchOn) //the switch is on and make it off
+            {
+                const apiUrl = `@Url.Action("UpdateLoadStatus", "LoadMonitoring")/1/0`; //make the state to 0
+                const Data = await fetch(apiUrl);
+                if (Data.status === 200) //status success
+                {
+                    const result = await Data.json();
+                    if (result == 'success') {
+                        toastr.success("Critical load is now off.");
+                    }
+                    else if (result == "error") {
+                        toastr.error("Critical load switch error.");
+                    }
+                    else {
+                        toastr.error("Update load status api error.");
+                    }
+                }
+                else {
+                    toastr.error("Update load status api error.");
+                }
+            } 
+            else 
+            {
+                const apiUrl = `@Url.Action("UpdateLoadStatus", "LoadMonitoring")/1/1`; //make the state to 1
+                const Data = await fetch(apiUrl);
+                if (Data.status === 200) //status success
+                {
+                    const result = await Data.json();
+                    if (result == 'success') {
+                        toastr.success("Critical load is now on.");
+                    }
+                    else if (result == "error") {
+                        toastr.error("Critical load switch error.");
+                    }
+                    else {
+                        toastr.error("Update load status api error.");
+                    }
+                }
+                else {
+                    toastr.error("Update load status api error.");
+                }
+            }
         }
     </script>
 }

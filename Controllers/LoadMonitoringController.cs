@@ -148,5 +148,28 @@ namespace SolarManagement.Controllers
             return query.state;
         }
 
+        [Route("[controller]/[action]/{espNum}")]
+        public async Task<string> UpdateLoadStatus(int espNum, int state)
+        {
+            var query = await (from load in _context.loadtbl where load.id == espNum select load).FirstOrDefaultAsync();
+            if (query == null)
+            {
+                return "error";
+            }
+
+            if(state == 1)
+            {
+                query.state = 0;
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                query.state = 1;
+                await _context.SaveChangesAsync();
+            }
+
+            return "success";
+        }
+
     }
 }
