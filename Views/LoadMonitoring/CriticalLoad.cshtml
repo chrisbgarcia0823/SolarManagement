@@ -300,10 +300,10 @@
                     if (Data.status === 200) //status success
                     {
                         const result = await Data.json();
-                        if (result == 'success') {
+                        if (result == 'updateSuccess') {
                             toastr.success("Critical load is now off.");
                         }
-                        else if (result == "error") {
+                        else if (result == "updateError") {
                             toastr.error("Critical load switch error.");
                         }
                         else {
@@ -320,10 +320,10 @@
                     if (Data.status === 200) //status success
                     {
                         const result = await Data.json();
-                        if (result == 'success') {
+                        if (result == 'updateSuccess') {
                             toastr.success("Critical load is now on.");
                         }
-                        else if (result == "error") {
+                        else if (result == "updateError") {
                             toastr.error("Critical load switch error.");
                         }
                         else {

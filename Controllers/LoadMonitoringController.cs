@@ -154,7 +154,7 @@ namespace SolarManagement.Controllers
             var query = await (from load in _context.loadtbl where load.id == espNum select load).FirstOrDefaultAsync();
             if (query == null)
             {
-                return "error";
+                return "updateError";
             }
 
             if(state == 1)
@@ -168,7 +168,7 @@ namespace SolarManagement.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return "success";
+            return "updateSuccess";
         }
 
     }
