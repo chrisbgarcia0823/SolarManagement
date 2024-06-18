@@ -242,14 +242,44 @@
             }, updateTime);
 
             //END UPDATING THE CHART --------------------------------------------------------------------------------------------------
+            
+            //FOR THE INITIAL STATE OF THE SWITCH BASE ON STATE IN loadtbl
+            async function GetState()
+            {
+                const apiUrl = `@Url.Action("GetLoadState", "LoadMonitoring")/1`;
+                const Data = await fetch(apiUrl);
+                if (Data.status === 200) //status success
+                {
+                    const result = await Data.json();
+                    if(result == 0)
+                    {
+                        $('input[name="my-checkbox"]').bootstrapSwitch('state', false);
+                    }
+                    else if(result == 1)
+                    {
+                        $('input[name="my-checkbox"]').bootstrapSwitch('state', true);
+                    }
+                    else
+                    {
+                        toastr.error("Fetch load status error");
+                    }
+                }
+                else {
+                    toastr.error("Fetch load status error");
+                }
+            }
+        
         });
     </script>
 
     @*FOR BOOTSTRAP SWITCH*@
     <script src="~/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+    @*TURN SWITCH ON OR OFF*@
     <script>
-        $("input[data-bootstrap-switch]").each(function () {
-            $(this).bootstrapSwitch('state', $(this).prop('checked'));
-        })
+        async function SwitchLoad(espNum)
+        {
+            //Turn the switch off by setting the state to false
+            $('input[name="my-checkbox"]').bootstrapSwitch('state', false);
+        }
     </script>
 }
