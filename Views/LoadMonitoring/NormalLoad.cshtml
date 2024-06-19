@@ -82,7 +82,10 @@
 </div>
 
 @section Scripts
-    {
+{
+    @*FOR BOOTSTRAP SWITCH*@
+    <script src="~/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+
     @*FOR ALERTS*@
     <script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
     <script src="~/plugins/toastr/toastr.min.js"></script>
@@ -243,14 +246,93 @@
             }, updateTime);
 
             //END UPDATING THE CHART --------------------------------------------------------------------------------------------------
-        });
-    </script>
+            //FOR THE INITIAL STATE OF THE SWITCH BASE ON STATE IN loadtbl
+            GetState();
 
-    @*FOR BOOTSTRAP SWITCH*@
-    <script src="~/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
-    <script>
-        $("input[data-bootstrap-switch]").each(function () {
-            $(this).bootstrapSwitch('state', $(this).prop('checked'));
-        })
+            async function GetState() {
+                const apiUrl = `@Url.Action("GetLoadState", "LoadMonitoring")/3`;
+                const Data = await fetch(apiUrl);
+                if (Data.status === 200) //status success
+                {
+                    const result = await Data.json();
+                    if (result == 0) {
+                        $('input[name="my-checkbox"]').bootstrapSwitch('state', false);
+                    }
+                    else if (result == 1) {
+                        $('input[name="my-checkbox"]').bootstrapSwitch('state', true);
+                    }
+                    else {
+                        toastr.error("Fetch load status error");
+                    }
+                }
+                else {
+                    toastr.error("Fetch load status error");
+                }
+            }
+
+            //CHECK FOR SWITCH EVENT TO CHANGE THE LOAD STATUS ON OR OFF
+            $("#my-checkbox").bootstrapSwitch({
+                onSwitchChange: function (event, state) {
+                    // This function fires whenever the switch is toggled
+                    console.log("The switch was clicked (toggled).");
+                    console.log("Current state:", state); // true for on, false for off
+                    // You can perform actions based on the switch state here
+                    UpdateStatus(state);
+                }
+            });
+
+            async function UpdateStatus(state) { //state is bool (true or false) false = off and true = on
+                //FOR ALERT
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+
+                if (state) //the switch is on and make it off
+                {
+                    const apiUrl = `@Url.Action("UpdateLoadStatus", "LoadMonitoring")/3/1`; //make the state to 0
+                    const Data = await fetch(apiUrl);
+                    if (Data.status === 200) //status success
+                    {
+                        const result = await Data.text();
+                        if (result == 'updateSuccess') {
+                            toastr.success("Critical load is now on.");
+                        }
+                        else if (result == "updateError") {
+                            toastr.error("Critical load switch error.");
+                        }
+                        else {
+                            toastr.error("Update load status api error.");
+                        }
+                    }
+                    else {
+                        toastr.error("Update load status api error.");
+                    }
+                }
+                else {
+                    const apiUrl = `@Url.Action("UpdateLoadStatus", "LoadMonitoring")/3/0`; //make the state to 1
+                    const Data = await fetch(apiUrl);
+                    if (Data.status === 200) //status success
+                    {
+                        const result = await Data.text();
+                        if (result == 'updateSuccess') {
+                            toastr.success("Critical load is now off.");
+                        }
+                        else if (result == "updateError") {
+                            toastr.error("Critical load switch error.");
+                        }
+                        else {
+                            toastr.error("Update load status api error.");
+                        }
+                    }
+                    else {
+                        toastr.error("Update load status api error.");
+                    }
+                }
+            };
+        
+        });
     </script>
 }
