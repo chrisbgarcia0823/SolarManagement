@@ -82,6 +82,9 @@
 
 @section Scripts
 {
+    @*FOR BOOTSTRAP SWITCH*@
+    <script src="~/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+
     @*FOR ALERTS*@
     <script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
     <script src="~/plugins/toastr/toastr.min.js"></script>
@@ -278,11 +281,11 @@
                     console.log("The switch was clicked (toggled).");
                     console.log("Current state:", state); // true for on, false for off
                     // You can perform actions based on the switch state here
-                    UpdateStatus();
+                    UpdateStatus(state);
                 }
             });
 
-            async function UpdateStatus() {
+            async function UpdateStatus(state) { //state is bool (true or false) false = off and true = on
                 //FOR ALERT
                 var Toast = Swal.mixin({
                     toast: true,
@@ -291,17 +294,15 @@
                     timer: 2000
                 });
 
-                const isSwitchOn = $("#my-checkbox").prop("checked");
-
-                if (isSwitchOn) //the switch is on and make it off
+                if (state) //the switch is on and make it off
                 {
-                    const apiUrl = `@Url.Action("UpdateLoadStatus", "LoadMonitoring")/1/0`; //make the state to 0
+                    const apiUrl = `@Url.Action("UpdateLoadStatus", "LoadMonitoring")/1/1`; //make the state to 0
                     const Data = await fetch(apiUrl);
                     if (Data.status === 200) //status success
                     {
-                        const result = await Data.json();
+                        const result = await Data.text();
                         if (result == 'updateSuccess') {
-                            toastr.success("Critical load is now off.");
+                            toastr.success("Critical load is now on.");
                         }
                         else if (result == "updateError") {
                             toastr.error("Critical load switch error.");
@@ -315,13 +316,13 @@
                     }
                 }
                 else {
-                    const apiUrl = `@Url.Action("UpdateLoadStatus", "LoadMonitoring")/1/1`; //make the state to 1
+                    const apiUrl = `@Url.Action("UpdateLoadStatus", "LoadMonitoring")/1/0`; //make the state to 1
                     const Data = await fetch(apiUrl);
                     if (Data.status === 200) //status success
                     {
-                        const result = await Data.json();
+                        const result = await Data.text();
                         if (result == 'updateSuccess') {
-                            toastr.success("Critical load is now on.");
+                            toastr.success("Critical load is now off.");
                         }
                         else if (result == "updateError") {
                             toastr.error("Critical load switch error.");
@@ -338,8 +339,5 @@
         
         });
     </script>
-
-    @*FOR BOOTSTRAP SWITCH*@
-    <script src="~/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
 
 }

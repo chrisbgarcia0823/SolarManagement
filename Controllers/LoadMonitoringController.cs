@@ -157,16 +157,8 @@ namespace SolarManagement.Controllers
                 return "updateError";
             }
 
-            if(state == 1)
-            {
-                query.state = 0;
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                query.state = 1;
-                await _context.SaveChangesAsync();
-            }
+            query.state = state;
+            await _context.SaveChangesAsync();
 
             return "updateSuccess";
         }
