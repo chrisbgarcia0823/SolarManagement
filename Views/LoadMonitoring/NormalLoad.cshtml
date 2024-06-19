@@ -298,10 +298,10 @@
                     {
                         const result = await Data.text();
                         if (result == 'updateSuccess') {
-                            toastr.success("Critical load is now on.");
+                            toastr.success("Normal load is now on.");
                         }
                         else if (result == "updateError") {
-                            toastr.error("Critical load switch error.");
+                            toastr.error("Normal load switch error.");
                         }
                         else {
                             toastr.error("Update load status api error.");
@@ -318,10 +318,10 @@
                     {
                         const result = await Data.text();
                         if (result == 'updateSuccess') {
-                            toastr.success("Critical load is now off.");
+                            toastr.success("Normal load is now off.");
                         }
                         else if (result == "updateError") {
-                            toastr.error("Critical load switch error.");
+                            toastr.error("Normal load switch error.");
                         }
                         else {
                             toastr.error("Update load status api error.");
