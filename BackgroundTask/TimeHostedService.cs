@@ -3,6 +3,7 @@ using SolarManagement.Data;
 using SolarManagement.Models;
 using SolarManagement.Helpers;
 using SolarManagement.ViewModel;
+using System.Reflection.Metadata;
 
 namespace SolarManagement.BackgroundTask
 {
@@ -41,7 +42,7 @@ namespace SolarManagement.BackgroundTask
                     "Timed Hosted Service is working. Count: {Count}", count);
 
                 //PUT CODE HERE --------------------------------------------------------------------------------------
-                await UpdateEsp(await IsBatteryOk()); //Update ESP based on battery status
+                await UpdateEsp(await BatteryState()); //Update ESP based on battery state
 
             }
 
@@ -66,9 +67,9 @@ namespace SolarManagement.BackgroundTask
         }
 
         //FOR CHECKING THE BATTERY DATA
-        public async Task<List<LoadData>> GetLoadData()
+        public async Task<List<BatteryVoltages>> GetLoadData()
         {
-            List<LoadData> batteryData = new List<LoadData>();
+            List<BatteryVoltages> batteryDataList = new List<BatteryVoltages>();
 
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -76,66 +77,90 @@ namespace SolarManagement.BackgroundTask
 
                 //PUT CODE HERE;
 
-                string sqlQuery = "SELECT * FROM [db3861].[dbo].[vPower]";
-                var data = _context.powertbl.FromSqlRaw(sqlQuery);
-                var loadData = from power in data
-                               select new LoadData
+                string sqlQuery = "SELECT * FROM [db3861].[dbo].[vBatteries]";
+                var query = _context.batterytbl.FromSqlRaw(sqlQuery);
+                var batteryData = from battery in query
+                               select new BatteryVoltages
                                {
-                                   id = power.id,
-                                   volt = power.volt,
-                                   power = power.power,
-                                   Ampere = power.Ampere,
-                                   EspNum = power.EspNum,
-                                   TimeData = power.datetimecreated.Value.ToString("HH:mm"),
-                                   DateData = power.datetimecreated.Value.ToString("MMM-dd-yyyy"),
+                                   Id = battery.id,
+                                   batterNumber = battery.batt,
+                                   voltage = battery.power,
+                                   temperature = battery.temp,
+                                   current = battery.Ampere,
+                                   TimeData = battery.dttmcreated.Value.ToString("HH:mm"),
+                                   DateData = battery.dttmcreated.Value.ToString("MMM-dd-yyyy"),
                                };
 
-                batteryData = await loadData.ToListAsync();
+                batteryDataList = await batteryData.ToListAsync();
             }
 
-            return batteryData;
+            return batteryDataList;
         }
 
         //CHECK BATTERY AVERAGE VOLTAGE
-        public async Task<bool> IsBatteryOk()
+        public async Task<string> BatteryState()
         {
-            List<LoadData> batteryData = await GetLoadData();
-            decimal totalVoltage = 0;
-            decimal averageVoltage = 0;
+            List<BatteryVoltages> batteryData = await GetLoadData();
+            int[] batteriesA = { 1, 2, 3, 4, 5, 6, 7, 8 };
+            int[] batteriesB = { 9, 10, 11, 12, 13, 14, 15, 16 };
 
-            foreach(var data in batteryData)
+            decimal totalVoltageA = 0; //for battery set A. 
+            decimal averageVoltageA = 0; //for battery set A. 
+
+            decimal totalVoltageB = 0; //for battery set B. 
+            decimal averageVoltageB = 0; //for battery set B. 
+
+            //Get battery set A voltages
+            var setA = (from data in batteryData where batteriesA.Contains(data.batterNumber.Value) select data).ToList();
+            foreach(var battery in setA)
             {
-                if(data.volt.HasValue)
+                if(battery.voltage.HasValue)
                 {
-                    totalVoltage += data.volt.Value;
+                    totalVoltageA += (decimal) battery.voltage.Value;
                 }
             }
 
-            averageVoltage = totalVoltage / batteryData.Count;
-
-            if(averageVoltage >= (decimal) 2.8)
+            //Get battery set B voltages
+            var setB = (from data in batteryData where batteriesB.Contains(data.batterNumber.Value) select data).ToList();
+            foreach (var battery in setB)
             {
-                return true;
+                if (battery.voltage.HasValue)
+                {
+                    totalVoltageB += (decimal) battery.voltage.Value;
+                }
             }
-            else if(averageVoltage <= (decimal) 2.5)
-            { 
-                return false; 
+
+            averageVoltageA = totalVoltageA / setA.Count;
+            averageVoltageB = totalVoltageB / setB.Count;
+
+            decimal TotalAverageVoltage = (averageVoltageA + averageVoltageB) / 2;
+
+            if (TotalAverageVoltage >= (decimal) 2.8)
+            {
+                return "on";
             }
             else
-            {
-                return false;
+            { 
+                if(TotalAverageVoltage < (decimal) 2.5)
+                {
+                    return "off";
+                }
+                else
+                {
+                    return "KeepState";
+                }
             }
         }
 
         //FOR UPDATING THE LOAD ESP TO TURN OFF ON BASED ON BATTERY VOLTAGE
-        public async Task UpdateEsp(bool isOk)
+        public async Task UpdateEsp(string state)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var _context = scope.ServiceProvider.GetRequiredService<SolarManagementContext>();  //Add this to use the SolarManagement data context
 
                 //PUT CODE HERE;
-                if (isOk)
+                if (state.ToLower() == "on")
                 {
                     //Turn on esp 2
                     var esp2 = await (from esp in _context.loadtbl where esp.id == 2 select esp).FirstOrDefaultAsync();
@@ -153,7 +178,7 @@ namespace SolarManagement.BackgroundTask
                         await _context.SaveChangesAsync();
                     }
                 }
-                else
+                else if(state.ToLower() == "off")
                 {
                     //Turn off esp 2
                     var esp2 = await (from esp in _context.loadtbl where esp.id == 2 select esp).FirstOrDefaultAsync();
@@ -171,7 +196,6 @@ namespace SolarManagement.BackgroundTask
                         await _context.SaveChangesAsync();
                     }
                 }
-
             }
         }
     }
