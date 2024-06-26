@@ -29,6 +29,15 @@ namespace SolarManagement.Controllers
             return View(queryList);
         }
 
+        public async Task<IActionResult> TableViewInput()
+        {
+            var query = from p in _context.powertbl2 select p;
+
+            var queryList = await query.ToListAsync();
+
+            return View(queryList);
+        }
+
         public async Task<IActionResult> CriticalLoad()
         {
 
