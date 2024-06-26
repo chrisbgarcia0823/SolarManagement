@@ -84,7 +84,7 @@
                 timer: 2000
             });
 
-            //FOR OUTPUT POWER MONITORING ---------------------------------------------------------------------------------
+            //FOR OUTPUT POWER MONITORING VARIABLES---------------------------------------------------------------------------------
             let loadVolt = [];
             let loadPower = [];
             let loadAmpere = [];
@@ -94,7 +94,6 @@
             let updateTime = 60 * 1000; //1seconds
             let isRealTime = false;
             let modalCloseBtn = document.getElementById('ModalCloseBtn')
-
 
             const apiUrl = `@Url.Action("GetLoadData", "power")`;
             const Data = await fetch(apiUrl);
@@ -111,8 +110,34 @@
                 };
             }
             else {
-                toastr.error("Error fetching data");
+                toastr.error("Error fetching output load data");
             }
+            //END FOR OUTPUT POWER MONITORING VARIABLES---------------------------------------------------------------------------------
+
+
+            //FOR THE INPUT POWER MONITORING VARIABLES---------------------------------------------------------------------------------
+            let loadVolt_Input = [];
+            let loadPower_Input = [];
+            let loadAmpere_Input = [];
+            let espNumber_Input = [];
+
+            const apiUrl_Input = `@Url.Action("GetLoadDataInput", "power")`;
+            const Data_Input = await fetch(apiUrl_Input);
+            if (Data_Input.status === 200) //status success
+            {
+                const result_Input = await Data_Input.json();
+                //iterate to get the result
+                for (i = 0; i < result_Input.length; i++) {
+                    loadVolt_Input.push(result_Input[i].volt);
+                    loadAmpere_Input.push(result_Input[i].ampere);
+                    espNumber_Input.push(result_Input[i].espNum);
+                    loadPower_Input.push(result_Input[i].power);
+                };
+            }
+            else {
+                toastr.error("Error fetching input load data");
+            }
+            //END FOR THE INPUT POWER MONITORING ---------------------------------------------------------------------------------
 
 
             //-------------
@@ -125,11 +150,18 @@
 
             const ChartData_Power = {
                 labels: espNumber,
-                datasets: [{
-                    label: 'Load Power',
-                    data: loadPower,
-                    backgroundColor: 'rgba(51, 51, 225, 0.5)',
-                }]
+                datasets: [
+                    {
+                        label: 'Input Load Power',
+                        data: loadPower_Input,
+                        backgroundColor: 'rgba(51, 51, 225, 0.5)',
+                    },
+                    {
+                        label: 'Output Load Power',
+                        data: loadPower,
+                        backgroundColor: 'rgba(246, 114, 128, 0.5)',
+                    }
+                ]
             };
 
             var ChartOptions_Power = {
@@ -179,11 +211,18 @@
 
             const ChartData_Voltage = {
                 labels: espNumber,
-                datasets: [{
-                    label: 'Load Voltage',
-                    data: loadVolt,
-                    backgroundColor: 'rgba(51, 51, 225, 0.5)',
-                }]
+                datasets: [
+                    {
+                        label: 'Input Load Voltage',
+                        data: loadVolt_Input,
+                        backgroundColor: 'rgba(51, 51, 225, 0.5)',
+                    },
+                    {
+                        label: 'Output Load Voltage',
+                        data: loadVolt,
+                        backgroundColor: 'rgba(246, 114, 128, 0.5)',
+                    }
+                ]
             };
 
             var ChartOptions_Voltage = {
@@ -233,11 +272,18 @@
 
             const ChartData_Ampere = {
                 labels: espNumber,
-                datasets: [{
-                    label: 'Load Current',
-                    data: loadAmpere,
-                    backgroundColor: 'rgba(51, 51, 225, 0.5)',
-                }]
+                datasets: [
+                    {
+                        label: 'Input Load Current',
+                        data: loadAmpere_Input,
+                        backgroundColor: 'rgba(51, 51, 225, 0.5)',
+                    },
+                    {
+                        label: 'Output Load Current',
+                        data: loadAmpere,
+                        backgroundColor: 'rgba(246, 114, 128, 0.5)',
+                    }
+                ]
             };
 
             var ChartOptions_Ampere = {
@@ -279,8 +325,10 @@
 
             //GET NEW DATA ---------------------------------------------------------------------------------------
 
-            async function getNewData() {
-                //clear the previous values
+            async function getNewData() 
+            {
+                //CLEAR PREVIOUS VALUES 
+                //for output load values ----------------------------------------------------------------
                 loadVolt = [];
                 loadPower = [];
                 loadAmpere = [];
@@ -288,26 +336,56 @@
                 loadDate = [];
                 currentTime = []
 
+
                 //URL ACTION OF THE METHOD TO ACCESS
-                const apiUrl = `@Url.Action("GetLoadData", "power")`;
+                const apiUrl_Update = `@Url.Action("GetLoadData", "power")`;
                 // Get the information of the selected item from the controller
-                const Data = await fetch(apiUrl);
-                if (Data.status === 200) //status success
+                const Data_Update = await fetch(apiUrl_Update);
+                if (Data_Update.status === 200) //status success
                 {
-                    const result = await Data.json();
+                    const result_Update = await Data_Update.json();
                     //iterate to get the result
-                    for (i = 0; i < result.length; i++) {
-                        loadVolt.push(result[i].volt);
-                        loadAmpere.push(result[i].ampere);
-                        currentTime.push(result[i].timeData.toString());
-                        espNumber.push(result[i].espNum);
-                        loadPower.push(result[i].power);
+                    for (i = 0; i < result_Update.length; i++) {
+                        loadVolt.push(result_Update[i].volt);
+                        loadAmpere.push(result_Update[i].ampere);
+                        currentTime.push(result_Update[i].timeData.toString());
+                        espNumber.push(result_Update[i].espNum);
+                        loadPower.push(result_Update[i].power);
+                    };
+
+                }
+                else 
+                {
+                    toastr.error("Error fectching input load update data");
+                }
+                //end for output load values -------------------------------------------------------------
+
+                //for output load values -----------------------------------------------------------------
+                let loadVolt_Input = [];
+                let loadPower_Input = [];
+                let loadAmpere_Input = [];
+                let espNumber_Input = [];
+
+                //URL ACTION OF THE METHOD TO ACCESS
+                const apiUrl_Update_Input = `@Url.Action("GetLoadDataInput", "power")`;
+                // Get the information of the selected item from the controller
+                const Data_Update_Input = await fetch(apiUrl_Update_Input);
+                if (Data_Update_Input.status === 200) //status success
+                {
+                    const result_Update_Input = await Data_Update_Input.json();
+                    //iterate to get the result
+                    for (i = 0; i < result_Update_Input.length; i++) {
+                        loadVolt_Input.push(result_Update_Input[i].volt);
+                        loadAmpere_Input.push(result_Update_Input[i].ampere);
+                        espNumber_Input.push(result_Update_Input[i].espNum);
+                        loadPower_Input.push(result_Update_Input[i].power);
                     };
 
                 }
                 else {
-                    toastr.error("Error fectching data");
+                    toastr.error("Error fectching input load update data");
                 }
+                //end for output load values -------------------------------------------------------------
             }
 
             // get new data every updateTime(as set above) and update chart
@@ -316,10 +394,15 @@
                 //get new data using api
                 await getNewData();
 
-                //update the chart data
+                //update the chart output load data ----------------------
                 myChart_Power.data.datasets[0].data = loadPower;
                 myChart_Voltage.data.datasets[0].data = loadVolt;
                 myChart_Ampere.data.datasets[0].data = loadAmpere;
+
+                //update the chart input load data ----------------------
+                myChart_Power.data.datasets[1].data = loadPower_Input;
+                myChart_Voltage.data.datasets[1].data = loadVolt_Input;
+                myChart_Ampere.data.datasets[1].data = loadAmpere_Input;
 
                 //update the chart
                 myChart_Power.update();

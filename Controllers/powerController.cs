@@ -57,7 +57,7 @@ namespace SolarManagement.Controllers
             return power;
         }
 
-        //TO GET THE LOAD DATA
+        //TO GET THE INPUT LOAD DATA
         [Route("[controller]/[action]")]
         public async Task<ActionResult<List<LoadData>>> GetLoadData()
         {
@@ -74,6 +74,27 @@ namespace SolarManagement.Controllers
                                       TimeData = power.datetimecreated.Value.ToString("HH:mm"),
                                       DateData = power.datetimecreated.Value.ToString("MMM-dd-yyyy"),
                                   };
+
+            return await loadData.ToListAsync();
+        }
+
+        //TO GET THE OUTPUT LOAD DATA
+        [Route("[controller]/[action]")]
+        public async Task<ActionResult<List<LoadData>>> GetLoadDataInput()
+        {
+            string sqlQuery = "SELECT * FROM [db3861].[dbo].[vPower2]";
+            var data = _context.powertbl.FromSqlRaw(sqlQuery);
+            var loadData = from power in data
+                           select new LoadData
+                           {
+                               id = power.id,
+                               volt = power.volt,
+                               power = power.power,
+                               Ampere = power.Ampere,
+                               EspNum = power.EspNum,
+                               TimeData = power.datetimecreated.Value.ToString("HH:mm"),
+                               DateData = power.datetimecreated.Value.ToString("MMM-dd-yyyy"),
+                           };
 
             return await loadData.ToListAsync();
         }
