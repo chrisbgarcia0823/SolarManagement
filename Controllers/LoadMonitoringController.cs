@@ -105,6 +105,45 @@ namespace SolarManagement.Controllers
             return await loadData.Take(60).OrderBy(data => data.id).ToListAsync();
         }
 
+        [Route("[controller]/[action]/{espNum}")]
+        public async Task<ActionResult<List<LoadData>>> GetLoadDataInput(string espNum)
+        {
+            string category = "";
+            if (espNum == "1")
+            {
+                category = "Critical Load";
+            }
+            else if (espNum == "2")
+            {
+                category = "Normal Load";
+            }
+            else if (espNum == "3")
+            {
+                category = "Less Priority Load";
+            }
+            else
+            {
+                category = "";
+            }
+
+            var loadData = from load in _context.powertbl2
+                           where load.EspNum.ToLower() == espNum.ToLower()
+                           orderby load.id descending
+                           select new LoadData
+                           {
+                               id = load.id,
+                               volt = load.volt,
+                               Ampere = load.Ampere,
+                               power = load.power,
+                               TimeData = load.datetimecreated.Value.ToString("HH:mm"),
+                               DateData = load.datetimecreated.Value.ToString("MMM-dd-yyyy"),
+                               EspNum = espNum,
+                               Category = category,
+                           };
+
+            return await loadData.Take(60).OrderBy(data => data.id).ToListAsync();
+        }
+
         //FETCH TO INDIVIDUALLY GET AN UPDATE ON THE DATA
         [Route("[controller]/[action]/{espNum}/{update}")]
         public async Task<ActionResult<LoadData>> UpdateLoadData(string espNum, string update)
@@ -141,6 +180,46 @@ namespace SolarManagement.Controllers
                                       EspNum = espNum,
                                       Category = category,
                                   };
+
+            return await loadData.FirstOrDefaultAsync();
+        }
+
+        //FETCH TO INDIVIDUALLY GET AN UPDATE ON THE DATA
+        [Route("[controller]/[action]/{espNum}/{update}")]
+        public async Task<ActionResult<LoadData>> UpdateLoadDataInput(string espNum, string update)
+        {
+            string category = "";
+            if (espNum == "1")
+            {
+                category = "Critical Load";
+            }
+            else if (espNum == "2")
+            {
+                category = "Normal Load";
+            }
+            else if (espNum == "3")
+            {
+                category = "Less Priority Load";
+            }
+            else
+            {
+                category = "";
+            }
+
+            var loadData = from load in _context.powertbl2
+                           where load.EspNum.ToLower() == espNum.ToLower()
+                           orderby load.id descending
+                           select new LoadData
+                           {
+                               id = load.id,
+                               volt = load.volt,
+                               Ampere = load.Ampere,
+                               power = load.power,
+                               TimeData = load.datetimecreated.Value.ToString("HH:mm"),
+                               DateData = load.datetimecreated.Value.ToString("MMM-dd-yyyy"),
+                               EspNum = espNum,
+                               Category = category,
+                           };
 
             return await loadData.FirstOrDefaultAsync();
         }

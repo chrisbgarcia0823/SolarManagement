@@ -134,7 +134,7 @@
                 timer: 2000
             });
 
-            //FOR BATTERY VOLATAGES DATA ---------------------------------------------------------------------------------
+            //FOR OUTPUT LOAD DATA ---------------------------------------------------------------------------------
             let id =[];
             let loadPower = [];
             let loadVolt = [];
@@ -161,6 +161,37 @@
                 toastr.error("Fetch data error");
             }
 
+            //END FOR OUTPUT LOAD DATA ---------------------------------------------------------------------------------
+
+            //FOR INPUT LOAD DATA ---------------------------------------------------------------------------------
+            let id_Input = [];
+            let loadPower_Input = [];
+            let loadVolt_Input = [];
+            let loadAmpere_Input = []
+            let timeData_Input = [];
+            let dateData_Input = [];
+            let Category_Input = [];
+
+            const apiUrl_Input = `@Url.Action("GetLoadDataInput", "LoadMonitoring")/1`;
+            const Data_Input = await fetch(apiUrl_Input);
+            if (Data_Input.status === 200) //status success
+            {
+                const result_Input = await Data_Input.json();
+                //iterate to get the result
+                for (i = 0; i < result_Input.length; i++) {
+                    loadPower_Input.push(result_Input[i].power);
+                    loadVolt_Input.push(result_Input[i].volt);
+                    loadAmpere_Input.push(result_Input[i].ampere);
+                    timeData_Input.push(result_Input[i].timeData.toString());
+                };
+            }
+            else {
+                toastr.error("Fetch data error");
+            }
+
+            //END FOR INPUT LOAD DATA ---------------------------------------------------------------------------------
+
+
             //-------------
             //- LINE CHART - VOLTAGES DATA
             //-------------
@@ -171,12 +202,21 @@
 
             const ChartData_Power = {
                 labels: timeData,
-                datasets: [{
-                    label: 'Live Load Power Data',
-                    data: loadPower,
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1
-                }]
+                datasets: 
+                [
+                    {
+                        label: 'Live Input Load Power Data',
+                        data: loadPower_Input,
+                        borderColor: 'rgb(232, 23, 93)',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Live Output Load Power Data',
+                        data: loadPower,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    },
+                ]
             };
 
             var ChartOptions_Power = {
@@ -210,8 +250,10 @@
                 });
 
             //FOR UPDATING THE CHART --------------------------------------------------------------------------------------------------
-            async function getNewData() {
-                //URL ACTION OF THE METHOD TO ACCESS
+            async function getNewData() 
+            {
+                //FOR OUTPUT LOAD DATA -------------------------------------------------------------------------------------------------------
+                
                 const apiUrl2 = `@Url.Action("UpdateLoadData", "LoadMonitoring")/1/update`;
                 // Get the information of the selected item from the controller
                 const Data2 = await fetch(apiUrl2);
@@ -235,6 +277,39 @@
                 else {
                     toastr.error("Fetch data error");
                 }
+
+                //END FOR OUTPUT LOAD DATA -------------------------------------------------------------------------------------------------------
+
+
+                //FOR INPUT LOAD DATA -------------------------------------------------------------------------------------------------------
+
+                const apiUrl2_Input = `@Url.Action("UpdateLoadDataInput", "LoadMonitoring")/1/update`;
+                // Get the information of the selected item from the controller
+                const Data2_Input = await fetch(apiUrl2_Input);
+                if (Data2_Input.status === 200) //status success
+                {
+                    const result2_Input = await Data2_Input.json();
+                    if (timeData_Input.at(-1) != result2_Input.timeData) 
+                    {
+                        loadPower_Input.shift(); //remove the first element of the power data
+                        loadVolt_Input.shift(); //remove the first element of the volt data
+                        loadAmpere_Input.shift() //remove the first element of the ampere data
+                        timeData_Input.shift(); //remove the first element of the time data
+
+                        //insert the fetch data to the last element
+                        loadPower_Input.push(result2_Input[i].power);
+                        loadVolt_Input.push(result2_Input[i].volt);
+                        loadAmpere_Input.push(result2_Input[i].ampere);
+                        timeData_Input.push(result2_Input[i].timeData.toString());
+                    }
+
+                }
+                else {
+                    toastr.error("Fetch data error");
+                }
+
+                //END FOR INPUT LOAD DATA -------------------------------------------------------------------------------------------------------
+
             }
 
             // get new data every updateTime(as set above) and update chart
