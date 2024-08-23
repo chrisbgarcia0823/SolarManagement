@@ -44,7 +44,18 @@
                                         <td>@data.volt</td>
                                         <td>@data.Ampere</td>
                                         <td>@data.power</td>
-                                        <td>@data.EspNum</td>
+                                        @if (data.EspNum.ToLower() == "1")
+                                        {
+                                            <td>Critical Load</td>
+                                        }
+                                        else if (data.EspNum.ToLower() == "2")
+                                        {
+                                            <td>Medium Load</td>
+                                        }
+                                        else
+                                        {
+                                            <td>Normal Load</td>
+                                        }
                                         <td>@data.datetimecreated?.ToString("g")</td>
                                     </tr>
                                 }

@@ -105,7 +105,7 @@
                     loadVolt.push(result[i].volt);
                     loadAmpere.push(result[i].ampere);
                     currentTime.push(result[i].timeData.toString());
-                    espNumber.push(result[i].espNum);
+                    espNumber.push(result[i].loadType);
                     loadPower.push(result[i].power);
                 };
             }
@@ -177,7 +177,7 @@
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'ESP Number',
+                            labelString: 'Load Type',
                         },
                     }],
                     yAxes: [{
@@ -238,7 +238,7 @@
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'ESP Number',
+                            labelString: 'Load Type',
                         },
                     }],
                     yAxes: [{
@@ -299,7 +299,7 @@
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'ESP Number',
+                            labelString: 'Load Type',
                         },
                     }],
                     yAxes: [{

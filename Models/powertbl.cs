@@ -31,5 +31,26 @@ namespace SolarManagement.Models
         [Column(TypeName = "decimal(18,3)")]
         public decimal? pf { get; set; }
 
+        [NotMapped]
+        public string? LoadType
+        {
+            get
+            {
+                if (EspNum.ToLower() == "1")
+                {
+                    return "Critical Load";
+                }
+                else if (EspNum.ToLower() == "2")
+                {
+                    return "Medium Load";
+                }
+                else
+                {
+                    return "Normal Load";
+                }
+            }
+            set { }
+        }
+
     }
 }

@@ -27,6 +27,8 @@ namespace SolarManagement.ViewModel
 
         public string? DateData { get; set; }
 
+        public string? LoadType { get; set; }
+
         
 
 

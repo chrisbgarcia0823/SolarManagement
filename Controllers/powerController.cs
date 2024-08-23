@@ -71,6 +71,7 @@ namespace SolarManagement.Controllers
                                       power = power.power,
                                       Ampere = power.Ampere,
                                       EspNum = power.EspNum,
+                                      LoadType = power.LoadType,
                                       TimeData = power.datetimecreated.Value.ToString("HH:mm"),
                                       DateData = power.datetimecreated.Value.ToString("MMM-dd-yyyy"),
                                   };
@@ -92,6 +93,7 @@ namespace SolarManagement.Controllers
                                power = power.power,
                                Ampere = power.Ampere,
                                EspNum = power.EspNum,
+                               LoadType = power.LoadType,
                                TimeData = power.datetimecreated.Value.ToString("HH:mm"),
                                DateData = power.datetimecreated.Value.ToString("MMM-dd-yyyy"),
                            };
