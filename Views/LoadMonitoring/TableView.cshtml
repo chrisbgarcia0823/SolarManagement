@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<SolarManagement.Models.powertbl>
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Loads Monitoring - Output Load Data";
     Layout = "~/Views/Shared/AdminLTE/_Layout.cshtml";
 }
 
@@ -46,15 +46,15 @@
                                         <td>@data.power</td>
                                         @if(data.EspNum.ToLower() == "1")
                                         {
-                                            <td>Critical Load</td>
+                                            <td>Essential Load</td>
                                         }
                                         else if (data.EspNum.ToLower() == "2")
                                         {
-                                            <td>Medium Load</td>
+                                            <td>Regular Load</td>
                                         }
                                         else
                                         {
-                                            <td>Normal Load</td>
+                                            <td>Non-essential Load</td>
                                         }
                                         <td>@data.datetimecreated?.ToString("g")</td>
                                     </tr>

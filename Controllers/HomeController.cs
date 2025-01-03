@@ -13,6 +13,7 @@ namespace SolarManagement.Controllers
 
         public HomeController(SolarManagementContext context)
         {
+            context.Database.SetCommandTimeout(0);
             _context = context;
         }
 

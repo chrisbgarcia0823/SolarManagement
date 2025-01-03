@@ -43,6 +43,7 @@ namespace SolarManagement.BackgroundTask
 
                 //PUT CODE HERE --------------------------------------------------------------------------------------
                 await UpdateEsp(await BatteryState()); //Update ESP based on battery state
+                await UpdateMpptEsp(); //Update the mppt relay based on battery voltage reading
 
             }
 
@@ -84,7 +85,7 @@ namespace SolarManagement.BackgroundTask
                                {
                                    Id = battery.id,
                                    batterNumber = battery.batt,
-                                   voltage = battery.power,
+                                   voltage = battery.volt,
                                    temperature = battery.temp,
                                    current = battery.Ampere,
                                    TimeData = battery.dttmcreated.Value.ToString("HH:mm"),
@@ -135,7 +136,7 @@ namespace SolarManagement.BackgroundTask
 
             decimal TotalAverageVoltage = (averageVoltageA + averageVoltageB) / 2;
 
-            if (TotalAverageVoltage >= (decimal) 2.8)
+            if (TotalAverageVoltage >= (decimal) 2.7)
             {
                 return "on";
             }
@@ -198,5 +199,41 @@ namespace SolarManagement.BackgroundTask
                 }
             }
         }
+
+        //UPDATE THE MPPT ESP TO TURN OFF BASED ON BATTERY VOLTAGE(Voltage is more than 4)
+        public async Task UpdateMpptEsp()
+        {
+            List<BatteryVoltages> batteryData = await GetLoadData();
+            var volt = from v in batteryData where v.voltage > (decimal)3.5 select v; // 1 or more battery has a voltage greater than 4 volts
+            if(volt.Count() > 0)
+            {
+                //UPDATE THE RELAY STATE TO 0 TO CUT OFF MPPT BATTERY CHARGING
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var _context = scope.ServiceProvider.GetRequiredService<SolarManagementContext>();  //Add this to use the SolarManagement data context
+                    var esp4 = await (from esp in _context.loadtbl where esp.id == 4 select esp).FirstOrDefaultAsync();
+                    if (esp4.state == 1)
+                    {
+                        esp4.state = 0;
+                        await _context.SaveChangesAsync();
+                    }
+                }
+            }
+            else
+            {
+                //UPDATE THE RELAY STATE TO 1 TO TURN ON MPPT BATTERY CHARGING
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var _context = scope.ServiceProvider.GetRequiredService<SolarManagementContext>();  //Add this to use the SolarManagement data context
+                    var esp4 = await (from esp in _context.loadtbl where esp.id == 4 select esp).FirstOrDefaultAsync();
+                    if (esp4.state == 0)
+                    {
+                        esp4.state = 1;
+                        await _context.SaveChangesAsync();
+                    }
+                }
+            }
+        }
+
     }
 }

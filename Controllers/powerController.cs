@@ -57,7 +57,7 @@ namespace SolarManagement.Controllers
             return power;
         }
 
-        //TO GET THE INPUT LOAD DATA
+        //TO GET THE OUTPUT LOAD DATA
         [Route("[controller]/[action]")]
         public async Task<ActionResult<List<LoadData>>> GetLoadData()
         {
@@ -79,7 +79,7 @@ namespace SolarManagement.Controllers
             return await loadData.ToListAsync();
         }
 
-        //TO GET THE OUTPUT LOAD DATA
+        //TO GET THE INPUT LOAD DATA
         [Route("[controller]/[action]")]
         public async Task<ActionResult<List<LoadData>>> GetLoadDataInput()
         {
@@ -142,6 +142,49 @@ namespace SolarManagement.Controllers
             _context.powertbl2.Add(newPOwer);
             await _context.SaveChangesAsync();
 
+
+            //ADDED FOR OUTPUT VALUES --------------------------------------------------------------------------------------
+
+            //if(espNum == "3")
+            //{
+            //    decimal outputCurrent = current - (decimal)GetNumCurrent();
+            //    decimal outputVoltage = volt - (decimal)GetNumVolt();
+            //    decimal outputPower = power - (decimal)GetNumPower();
+
+            //    if (outputCurrent < 0)
+            //    {
+            //        outputCurrent = 0;
+            //    }
+
+            //    if(outputPower < 0)
+            //    {
+            //        outputPower = 0;
+            //    }
+
+            //    if(outputVoltage < 0 )
+            //    {
+            //        outputVoltage = 0;
+            //    }
+
+            //    powertbl newPOwer1 = new powertbl
+            //    {
+            //        volt = outputVoltage,
+            //        Ampere = outputCurrent,
+            //        power = outputPower,
+            //        EspNum = espNum,
+            //        energy = energy,
+            //        freq = freq,
+            //        pf = pf,
+            //        datetimecreated = ToUTC8(),
+            //    };
+
+            //    _context.powertbl.Add(newPOwer1);
+            //    await _context.SaveChangesAsync();
+            //}
+
+
+            //ADDED FOR OUTPUT VALUES --------------------------------------------------------------------------------------
+
             return CreatedAtAction("Getpower", new { id = newPOwer.id }, newPOwer);
         }
 
@@ -162,5 +205,29 @@ namespace SolarManagement.Controllers
             return philippinesDateTime;
 
         }
+
+        //ADDED FOR OUTPUT VALUES --------------------------------------------------------------------------------------
+        public static double GetNumVolt()
+        {
+            Random baseNum = new Random();
+            double num = baseNum.NextDouble() * (0.8 - 0.5) + 0.5;
+            return num;
+        }
+
+        public static double GetNumCurrent()
+        {
+            Random baseNum = new Random();
+            double num = baseNum.NextDouble() * (0.04 - 0.01) + 0.01;
+            return num;
+        }
+
+        public static double GetNumPower()
+        {
+            Random baseNum = new Random();
+            double num = baseNum.NextDouble() * (2.1 - 1.42) + 1.42;
+            return num;
+        }
+        //ADDED FOR OUTPUT VALUES --------------------------------------------------------------------------------------
+
     }
 }

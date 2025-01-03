@@ -30,5 +30,6 @@ namespace SolarManagement.Models
 
         [Column(TypeName = "decimal(18,3)")]
         public decimal? pf { get; set; }
+
     }
 }

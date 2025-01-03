@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SolarManagement.Data;
+using SolarManagement.Models;
 using SolarManagement.ViewModel;
 using System;
 
@@ -42,7 +43,7 @@ namespace SolarManagement.Controllers
         {
 
             var query = from p in _context.powertbl where p.EspNum.ToLower() == "1" select p;
-
+           
             var queryList = await query.ToListAsync();
 
             return View(queryList);
@@ -72,15 +73,15 @@ namespace SolarManagement.Controllers
             string category = "";
             if (espNum == "1")
             {
-                category = "Critical Load";
+                category = "Essentials Loads";
             }
             else if (espNum == "2")
             {
-                category = "Normal Load";
+                category = "Regular Loads";
             }
             else if (espNum == "3")
             {
-                category = "Less Priority Load";
+                category = "Non-essential Loads";
             }
             else
             {
@@ -111,15 +112,15 @@ namespace SolarManagement.Controllers
             string category = "";
             if (espNum == "1")
             {
-                category = "Critical Load";
+                category = "Essentials Loads";
             }
             else if (espNum == "2")
             {
-                category = "Normal Load";
+                category = "Regular Loads";
             }
             else if (espNum == "3")
             {
-                category = "Less Priority Load";
+                category = "Non-essential Loads";
             }
             else
             {
@@ -151,15 +152,15 @@ namespace SolarManagement.Controllers
             string category = "";
             if (espNum == "1")
             {
-                category = "Critical Load";
+                category = "Essentials Loads";
             }
             else if (espNum == "2")
             {
-                category = "Normal Load";
+                category = "Regular Loads";
             }
             else if (espNum == "3")
             {
-                category = "Less Priority Load";
+                category = "Non-essential Loads";
             }
             else
             {
@@ -191,15 +192,15 @@ namespace SolarManagement.Controllers
             string category = "";
             if (espNum == "1")
             {
-                category = "Critical Load";
+                category = "Essentials Loads";
             }
             else if (espNum == "2")
             {
-                category = "Normal Load";
+                category = "Regular Loads";
             }
             else if (espNum == "3")
             {
-                category = "Less Priority Load";
+                category = "Non-essential Loads";
             }
             else
             {

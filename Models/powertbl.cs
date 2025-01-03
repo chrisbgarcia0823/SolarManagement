@@ -38,15 +38,15 @@ namespace SolarManagement.Models
             {
                 if (EspNum.ToLower() == "1")
                 {
-                    return "Critical Load";
+                    return "Essentials Load";
                 }
                 else if (EspNum.ToLower() == "2")
                 {
-                    return "Medium Load";
+                    return "Regular Load";
                 }
                 else
                 {
-                    return "Normal Load";
+                    return "Non-essential Load";
                 }
             }
             set { }

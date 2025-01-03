@@ -11,6 +11,7 @@ namespace SolarManagement.Controllers
 
         public batteryController(SolarManagementContext context)
         {
+            context.Database.SetCommandTimeout(0);
             _context = context;
         }
 
