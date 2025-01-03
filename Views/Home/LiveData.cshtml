@@ -49,6 +49,9 @@
                 let timeData = [];
                 let updateTime = 1 * 1000; //1seconds
 
+                //FOR THE NEW REQUEST X-AXIS OF NOT TIME BASE BUT COUNT FROM 1 - 60
+                let new_timeData = Array.from({ length: 60 }, (_, i) => i + 1);
+
 
                 const apiUrl = `@Url.Action("GetBatteryData", "Home")/${batteryNumber}`;
                 const Data = await fetch(apiUrl);
@@ -74,7 +77,7 @@
                 var lineChartCanvas = $('#LiveData-Voltages').get(0).getContext('2d'); //this will be my chart
 
                 const ChartData = {
-                    labels: timeData,
+                    labels: new_timeData,
                     datasets: [{
                         label: 'Live Battery Voltage Data',
                         data: batteryVoltage,
@@ -171,6 +174,8 @@
                 let timeData = [];
                 let updateTime = 1 * 1000; //1seconds
 
+                //FOR THE NEW REQUEST X-AXIS OF NOT TIME BASE BUT COUNT FROM 1 - 60
+                let new_timeData = Array.from({ length: 60 }, (_, i) => i + 1);
 
                 const apiUrl = `@Url.Action("GetBatteryData", "Home")/${batteryNumber}`;
                 const Data = await fetch(apiUrl);
@@ -196,7 +201,7 @@
                 var lineChartCanvas = $('#LiveData-Voltages').get(0).getContext('2d'); //this will be my chart
 
                 const ChartData = {
-                    labels: timeData,
+                    labels: new_timeData,
                     datasets: [{
                         label: 'Live Battery Temperature Data',
                         data: batteryTemperature,
