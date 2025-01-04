@@ -19,7 +19,7 @@
     <div class="card-body">
         <div class="row" id="LiveData_Div">
             @*LIVE DATA FROM FETCH API WILL GO HERE*@
-            <canvas id="LiveData-Voltages" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            <canvas id="LiveData-Voltages" style="min-height: 250px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
         </div>
     </div>
 </div>
@@ -77,7 +77,7 @@
                 var lineChartCanvas = $('#LiveData-Voltages').get(0).getContext('2d'); //this will be my chart
 
                 const ChartData = {
-                    labels: new_timeData,
+                    labels: timeData,
                     datasets: [{
                         label: 'Live Battery Voltage Data',
                         data: batteryVoltage,
@@ -99,11 +99,16 @@
                                 display: true,
                             },
                             max: 60,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Date-Time',
+                            },
                         }],
                         yAxes: [{
                             gridLines: {
                                 display: true,
-                            }
+                            },
+                            ticks: { min: 0, max: 5, stepSize: 0.2, }
                         }]
                     },
                     fill: false
@@ -201,7 +206,7 @@
                 var lineChartCanvas = $('#LiveData-Voltages').get(0).getContext('2d'); //this will be my chart
 
                 const ChartData = {
-                    labels: new_timeData,
+                    labels: timeData,
                     datasets: [{
                         label: 'Live Battery Temperature Data',
                         data: batteryTemperature,
@@ -225,13 +230,14 @@
                             max: 60,
                             scaleLabel: {
                                 display: true,
-                                labelString: 'Battery Number',
+                                labelString: 'Date-Time',
                             }
                         }],
                         yAxes: [{
                             gridLines: {
                                 display: true,
                             },
+                            ticks: { min:0, max: 60 },
                             scaleLabel: {
                                 display: true,
                                 labelString: 'Celcius',

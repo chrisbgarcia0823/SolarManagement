@@ -68,7 +68,7 @@ namespace SolarManagement.Controllers
                                       Id = battery.id,
                                       voltage = battery.volt,
                                       temperature = battery.temp,
-                                      TimeData = battery.dttmcreated.Value.ToString("HH:mm"),
+                                      TimeData = battery.dttmcreated.Value.ToString("yyyy-MM-dd HH:mm"),
                                       DateData = battery.dttmcreated.Value.ToString("MMM-dd-yyyy"),
                                   };
 
@@ -86,7 +86,7 @@ namespace SolarManagement.Controllers
                                   {
                                       voltage = battery.volt,
                                       temperature = battery.temp,
-                                      TimeData = battery.dttmcreated.Value.ToString("HH:mm"),
+                                      TimeData = battery.dttmcreated.Value.ToString("yyyy-MM-dd HH:mm"),
                                       DateData = battery.dttmcreated.Value.ToString("MMM-dd-yyyy"),
                                   };
 
