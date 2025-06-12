@@ -54,10 +54,12 @@ namespace SolarManagement.Controllers
         {
             batterytbl newData = new batterytbl
             {
-                volt = volt,
+                //volt = volt,
+                volt = ((decimal)0.3402 * volt) + (decimal)1.7876, //calibrated voltage
                 Ampere = current,
                 power = power,
-                temp = temp,
+                //temp = temp,
+                temp = ((decimal)1.008 * temp) - (decimal)0.2405, //calibrated temperature
                 batt = battNum,
                 dttmcreated = ToUTC8(),
             };
