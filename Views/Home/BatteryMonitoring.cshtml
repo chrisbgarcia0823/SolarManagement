@@ -24,7 +24,7 @@
     </div>
     <div class="card-body">
         <div class="chart" id="VoltageDiv">
-            <canvas id="BarChart-Voltages" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            <canvas id="BarChart-Voltages" style="min-height: 250px; height: 450px; max-height: 450px; max-width: 100%;"></canvas>
         </div>
     </div>
 </div>
@@ -40,7 +40,7 @@
     </div>
     <div class="card-body">
         <div class="chart" id="TemperatureDiv">
-            <canvas id="BarChart-Temperature" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            <canvas id="BarChart-Temperature" style="min-height: 250px; height: 450px; max-height: 450px; max-width: 100%;"></canvas>
         </div>
     </div>
 </div>
@@ -124,7 +124,8 @@
                     yAxes: [{
                         ticks: {
                             beginAtZero: true,
-                            max: 4
+                            max: 5,
+                            stepSize: 0.2,
                         },
                         display: true,
                         scaleLabel:
@@ -178,7 +179,8 @@
                     yAxes: [{
                         ticks: {
                             beginAtZero: true,
-                            max: 50
+                            max: 60,
+                            min: 0,
                         },
                         display: true,
                         scaleLabel:

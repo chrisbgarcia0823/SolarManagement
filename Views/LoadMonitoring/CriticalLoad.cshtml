@@ -36,7 +36,7 @@
     </div>
     <div class="card-body">
         <div class="chart" id="VoltageDiv">
-            <canvas id="LiveData-Power" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            <canvas id="LiveData-Power" style="min-height: 550px; height: 550px; max-height: 550px; max-width: 100%;"></canvas>
         </div>
     </div>
 </div>
@@ -234,13 +234,14 @@
                         max: 60,
                         scaleLabel: {
                             display: true,
-                            labelString: 'Time',
+                            labelString: 'Date-Time',
                         },
                     }],
                     yAxes: [{
                         gridLines: {
                             display: true,
                         },
+                        ticks: { min: 0, max: 2500, stepSize: 50, },
                         display: true,
                         scaleLabel:
                         {
