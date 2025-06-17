@@ -4,6 +4,7 @@ using System.Diagnostics;
 using SolarManagement.Data;
 using Microsoft.EntityFrameworkCore;
 using SolarManagement.ViewModel;
+using System.Text;
 
 namespace SolarManagement.Controllers
 {
@@ -98,6 +99,32 @@ namespace SolarManagement.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public async Task<IActionResult> GetData()
+        {
+            var query = from batt in _context.batterytbl
+                        orderby batt.id descending
+                        select new ForCSV
+                        {
+                            Id = batt.id,
+                            Voltage = batt.volt,
+                            Temperature = batt.temp,
+                            BatteryNumber = batt.batt,
+                            Date = batt.dttmcreated.Value.ToString("dd-MMM-yyyy HH:mm:ss")
+                        };
+
+            var battData = await query.ToListAsync();
+            
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Id,Voltage,Temperature,Battery #,Date");
+
+            foreach (var data in battData)
+            {
+                sb.AppendLine($"{data.Id},{data.Voltage},{data.Temperature},{data.BatteryNumber},{data.Date}");
+            }
+            
+            return File(Encoding.UTF8.GetBytes(sb.ToString()), "text/csv", $"{DateTime.Now.Date}-Battery Data.csv");
         }
     }
 }
