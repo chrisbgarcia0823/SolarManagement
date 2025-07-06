@@ -126,5 +126,30 @@ namespace SolarManagement.Controllers
             
             return File(Encoding.UTF8.GetBytes(sb.ToString()), "text/csv", $"{DateTime.Now.Date}-Battery Data.csv");
         }
+
+        public async Task<IActionResult> GetDataInputCurrent()
+        {
+            var query = from curr in _context.currenttbl
+                        orderby curr.id descending
+                        where curr.process == "1"
+                        select new ForCSV_Current
+                        {
+                            Id = curr.id,
+                            Current = curr.curr,
+                            DateCreated = curr.dttmcreated.Value.ToString("dd-MMM-yyyy HH:mm:ss")
+                        };
+
+            var battData = await query.ToListAsync();
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Id,Current,Date");
+
+            foreach (var data in battData)
+            {
+                sb.AppendLine($"{data.Id},{data.Current},{data.DateCreated}");
+            }
+
+            return File(Encoding.UTF8.GetBytes(sb.ToString()), "text/csv", $"{DateTime.Now.Date}-Battery Data.csv");
+        }
     }
 }

@@ -127,6 +127,41 @@
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("GetDataInputCurrent", "Home")" class="nav-link @Url.MakeActiveClass("Home", "GetDataInputCurrent")">
+                                <i class="nav-icon fas fa-solar-panel"></i>
+                                <p>
+                                    Input Current Data
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link @Url.MakeActiveClass("LoadMonitoring")">
+                        <i class="nav-icon fas fa-solar-panel"></i>
+                        <p>
+                            Input Current
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="@Url.Action("InputCurrent", "LoadMonitoring")" class="nav-link @Url.MakeActiveClass("LoadMonitoring", "InputCurrent")">
+                                <i class="nav-icon fas fa-table"></i>
+                                <p>
+                                    Input Current
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("GetDataInputCurrent", "Home")" class="nav-link @Url.MakeActiveClass("Home", "GetDataInputCurrent")">
+                                <i class="nav-icon fas fa-download"></i>
+                                <p>
+                                    Download Data
+                                </p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 @*<li class="nav-item">

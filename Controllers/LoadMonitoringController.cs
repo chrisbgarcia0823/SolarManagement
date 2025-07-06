@@ -252,5 +252,42 @@ namespace SolarManagement.Controllers
             return "updateSuccess";
         }
 
+        public IActionResult InputCurrent()
+        {
+            return View();
+        }
+
+        public async Task<ActionResult<List<InputCurrent>>> GetInputCurrentData()
+        {
+            var batteryVoltages = from curr in _context.currenttbl
+                                  where curr.process == "1"
+                                  orderby curr.id descending
+                                  select new InputCurrent
+                                  {
+                                      Id = curr.id,
+                                      Current = curr.curr,
+                                      TimeData = curr.dttmcreated.Value.ToString("yyyy-MM-dd HH:mm"),
+                                      DateData = curr.dttmcreated.Value.ToString("MMM-dd-yyyy"),
+                                  };
+
+            return await batteryVoltages.Take(60).OrderBy(data => data.Id).ToListAsync();
+        }
+
+        public async Task<ActionResult<InputCurrent>> LoadNewInputCurrentData()
+        {
+            var query = from curr in _context.currenttbl
+                        where curr.process == "1"
+                        orderby curr.id descending
+                        select new InputCurrent
+                        {
+                            Id = curr.id,
+                            Current = curr.curr,
+                            TimeData = curr.dttmcreated.Value.ToString("yyyy-MM-dd HH:mm"),
+                            DateData = curr.dttmcreated.Value.ToString("MMM-dd-yyyy"),
+                        };
+
+            return await query.FirstOrDefaultAsync(); ;
+        }
+
     }
 }
